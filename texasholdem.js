@@ -265,7 +265,7 @@ var Game = function (players, button, matchCallback) {
         player.resetHand();
     }
 
-    dispatchEvent(new GameStartEvent());
+    dispatchEvent(new GameStartEvent(players));
 
     deal();
 
@@ -296,8 +296,8 @@ var PlayerMoneyChange = function (player, change) {
     this.change = change;
 };
 
-var GameStartEvent = function () {
-
+var GameStartEvent = function (players) {
+    this.players = players;
 };
 
 var BettingPreflopAwaitEvent = function (player, callback, current, toCall) {

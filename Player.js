@@ -86,10 +86,16 @@ var UserController = function (player, root) {
     });
 
     var resetUI = function () {
-
         document.getElementById("user-cards").innerHTML = "";
         document.getElementById("board").innerHTML = "";
+    }
 
+    var drawBoard = function(players) {
+        for (let player of players) {
+            var playerRoot = document.createElement("div");
+            playerRoot.setAttribute("name", player.getName());
+            root.appendChild(playerRoot);
+        }
     }
 
     //Allows game to notify player of events
@@ -98,6 +104,7 @@ var UserController = function (player, root) {
         if (e instanceof GameStartEvent) {
             
             resetUI();
+            drawBoard(e.players);
 
         } else if (e instanceof DealtHandEvent) {
 

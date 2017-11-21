@@ -1,4 +1,3 @@
-
 var Deck = function () {
     var cards = [];
     for (var suit of ["S", "H", "D", "C"]) {
@@ -41,7 +40,7 @@ Card.prototype.equals = function (that) {
 Card.prototype.getImage = function () {
     var img = document.createElement("img");
     img.src = "cards-svg/" + this.rank + this.suit + ".png";
-    img.alt = this.rank + this.suit;
+    img.alt = this.toString();
     return img;
 };
 
@@ -86,6 +85,10 @@ Card.prototype.rankNumberAceLow = function () {
 }
 
 var Hands = (function () {
+
+    var Types = {
+        "STRAIGHT": "Straight"
+    }
 
     var difference = function (set, subset) {
         var result = set.slice(0);
@@ -169,7 +172,8 @@ var Hands = (function () {
                 if (results[currentIndex][0].suit === cards[i].suit) {
                     results[currentIndex].push(cards[i]);
                 } else {
-                    results[++currentIndex] = [cards[i]];
+                    ++currentIndex;
+                    results[currentIndex] = [cards[i]];
                 }
             }
         }
@@ -383,7 +387,8 @@ var Hands = (function () {
 
     return {
         bestHand: bestHand,
-        getScore: getScore
+        getScore: getScore,
+        Types: Types
     };
 
 })();
