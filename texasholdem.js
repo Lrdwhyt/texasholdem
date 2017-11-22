@@ -74,7 +74,11 @@ var Pot = function () {
     this.total = 0;
 }
 
-Pot.prototype.add = function(amount) {
+Pot.prototype.increment = function(amount) {
+    this.bet += amount;
+}
+
+Pot.prototype.add = function (amount) {
     this.total += amount;
 }
 
@@ -121,6 +125,17 @@ var Game = function (matchPlayers, button, matchCallback) {
         return results;
     }
 
+    var deductAntes = function(ante) {
+        for (let player of players) {
+            if (player.getMoney() >= ante) {
+                modMoney(player, -ante);
+                pot += ante;
+            } else {
+                // Not enough to cover ante!
+            }
+        }
+    }
+
     var getNextPlayer = function (player) {
         var i = players.indexOf(player);
         ++i;
@@ -151,7 +166,12 @@ var Game = function (matchPlayers, button, matchCallback) {
                 break;
 
             case BetType.RAISE:
-                // TODO: Implement
+                let toCallDifference = currentBet - bets[player.getName()];
+                if (player.getMoney() >= bet.amount && bet.amount > toCallDifference) {
+                    return true;
+                } else {
+                    return false;
+                }
                 break;
 
             case BetType.CHECK:
@@ -169,13 +189,14 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
 
     var processBet = function (player, bet) {
-        switch(bet.type) {
+        switch (bet.type) {
             case BetType.CALL:
                 var toCallDifference = currentBet - bets[player.getName()];
                 if (player.getMoney() >= toCallDifference) {
                     pot += toCallDifference;
                     bets[player.getName()] += toCallDifference;
                     modMoney(player, -toCallDifference);
+                    mainPot.add(toCallDifference);
                 } else {
                     // TODO: All-in, create side pots
                     pot += player.getMoney();
@@ -185,28 +206,14 @@ var Game = function (matchPlayers, button, matchCallback) {
                 break;
 
             case BetType.CHECK:
-                if (currentBet === bets[player.getName()]) {
-                    // Valid bet
-                } else {
-                    // Can't check
-                    console.log("invalid check");
-                    return false;
-                }
                 break;
 
             case BetType.RAISE:
-                var toRaiseDifference = currentBet - bets[player.getName()] + bet.amount;
-                if (bet.amount > 0 && player.getMoney() >= toRaiseDifference) {
-                    // Valid raise
-                    lastPlayer = getPrevPlayer(player);
-                    currentBet += bet.amount;
-                    bets[player.getName()] += toRaiseDifference;
-                    pot += toRaiseDifference;
-                    modMoney(player, -toRaiseDifference);
-                } else {
-                    // invalid raise amount
-                    return false;
-                }
+                lastPlayer = getPrevPlayer(player);
+                currentBet += bet.amount - (currentBet - bets[player.getName()]);
+                bets[player.getName()] += bet.amount;
+                pot += bet.amount;
+                modMoney(player, -bet.amount);
                 break;
 
             case BetType.FOLD:
@@ -229,7 +236,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         flop.push(deck.deal());
         dispatchEvent(new DealtFlopEvent(flop));
         bettingStage = BettingStage.FLOP;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet));
+        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
     };
 
     var dealTurn = function () {
@@ -237,7 +244,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         turn.push(deck.deal());
         dispatchEvent(new DealtTurnEvent(turn));
         bettingStage = BettingStage.TURN;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet));
+        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
     }
 
     var dealRiver = function () {
@@ -245,16 +252,17 @@ var Game = function (matchPlayers, button, matchCallback) {
         river.push(deck.deal());
         dispatchEvent(new DealtRiverEvent(river));
         bettingStage = BettingStage.RIVER;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet));
+        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
     }
 
-    var makeBet = function(player, bet) {
+    var makeBet = function (player, bet) {
         if (currentPlayer !== player) {
             return; // Not player's turn to bet
         } else if (isValidBet(player, bet) === false) {
-            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet));
+            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
             return; // Not a valid bet
         }
+
         processBet(player, bet);
         dispatchEvent(new BetMadeEvent(player, bet));
         currentPlayer = getNextPlayer(player);
@@ -278,7 +286,7 @@ var Game = function (matchPlayers, button, matchCallback) {
                     break;
             }
         } else {
-            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, mainPot, bets[currentPlayer]));
+            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
         }
     }
 
@@ -291,17 +299,22 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     };
 
+    var players = matchPlayers.slice(0);
+    var bettingPlayers = matchPlayers.slice(0);
+
+    var matchNotify = matchCallback;
+
     var deck = new Deck();
     deck.shuffle();
-    var players = matchPlayers.slice(0);
     var flop = [];
     var turn = [];
     var river = [];
+
     var mainPot = new Pot();
     var sidePots = [];
     var pot = 0;
     var bets = {};
-    var matchNotify = matchCallback;
+    
     var bettingStage = BettingStage.NONE;
 
     for (let player of players) {
@@ -309,6 +322,8 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
 
     dispatchEvent(new GameStartEvent(players));
+
+    deductAntes(5);
 
     deal();
 
@@ -326,7 +341,7 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
     bettingStage = BettingStage.PREFLOP;
 
-    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, bets[currentPlayer], 0));
+    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, 0, bets[currentPlayer.getName()]));
 
 }
 
@@ -344,11 +359,11 @@ var GameStartEvent = function (players) {
     this.players = players;
 };
 
-var BetAwaitEvent = function (player, callback, current, toCall) {
+var BetAwaitEvent = function (player, callback, current, committed) {
     this.player = player;
     this.callback = callback;
     this.current = current;
-    this.toCall = toCall;
+    this.committed = committed;
 };
 
 var BetMadeEvent = function (player, bet) {
@@ -372,7 +387,7 @@ var GameEndEvent = function (result) {
     this.result = result;
 };
 
-var Bet = function(type, amount) {
+var Bet = function (type, amount) {
     this.type = type;
     this.amount = amount;
 }

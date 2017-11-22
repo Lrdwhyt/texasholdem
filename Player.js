@@ -62,21 +62,25 @@ var UserController = function (player, root) {
                 callbackFunction = null;
                 callback(player, new Bet(BetType.RAISE, amount));
                 break;
+
             case "call":
                 var callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.CALL));
                 break;
+
             case "all-in":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, BetType.ALL_IN);
+                callback(player, new Bet(BetType.RAISE, player.getMoney()));
                 break;
+
             case "fold":
                 var callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.FOLD));
                 break;
+
             case "check":
                 var callback = callbackFunction;
                 callbackFunction = null;
