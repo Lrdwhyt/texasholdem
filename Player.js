@@ -60,27 +60,27 @@ var UserController = function (player, root) {
                 var amount = parseInt(document.getElementById("bet").value);
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, Bets.RAISE, amount);
+                callback(player, new Bet(BetType.RAISE, amount));
                 break;
             case "call":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, Bets.CALL);
+                callback(player, new Bet(BetType.CALL));
                 break;
             case "all-in":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, Bets.ALL_IN);
+                callback(player, BetType.ALL_IN);
                 break;
             case "fold":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, Bets.FOLD);
+                callback(player, new Bet(BetType.FOLD));
                 break;
             case "check":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, Bets.CHECK);
+                callback(player, new Bet(BetType.CHECK));
                 break;
         }
     });
@@ -125,15 +125,15 @@ var UserController = function (player, root) {
                 document.getElementById("user-cards").appendChild(card.getImage());
             }
 
-        } else if (e instanceof BettingPreflopAwaitEvent) {
+        } else if (e instanceof BetAwaitEvent) {
             if (e.player === player) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
             }
 
-        } else if (e instanceof BettingPreflopBetEvent) {
+        } else if (e instanceof BetMadeEvent) {
 
-            console.log(e.player.getName() + " bet " + e.type + ", " + e.amount);
+            console.log(e.player.getName() + " bet " + e.bet.type + ", " + e.bet.amount);
 
         } else if (e instanceof DealtFlopEvent) {
 
@@ -142,16 +142,6 @@ var UserController = function (player, root) {
                 document.getElementById("board").appendChild(card.getImage());
             }
 
-        } else if (e instanceof BettingFlopAwaitEvent) {
-            if (e.player === player) {
-                console.log("Your turn!");
-                callbackFunction = e.callback;
-            }
-
-        } else if (e instanceof BettingFlopBetEvent) {
-
-            console.log(e.player.getName() + " bet " + e.type + ", " + e.amount);
-
         } else if (e instanceof DealtTurnEvent) {
 
             console.log(e.cards);
@@ -159,34 +149,12 @@ var UserController = function (player, root) {
                 document.getElementById("board").appendChild(card.getImage());
             }
 
-        } else if (e instanceof BettingTurnAwaitEvent) {
-
-            if (e.player === player) {
-                console.log("Your turn!");
-                callbackFunction = e.callback;
-            }
-
-        } else if (e instanceof BettingTurnBetEvent) {
-
-            console.log(e.player.getName() + " bet " + e.type + ", " + e.amount);
-
         } else if (e instanceof DealtRiverEvent) {
 
             console.log(e.cards);
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
-
-        } else if (e instanceof BettingRiverAwaitEvent) {
-
-            if (e.player === player) {
-                console.log("Your turn!");
-                callbackFunction = e.callback;
-            }
-
-        } else if (e instanceof BettingRiverBetEvent) {
-
-            console.log(e.player.getName() + " bet " + e.type + ", " + e.amount);
 
         } else if (e instanceof GameEndEvent) {
 
