@@ -264,7 +264,7 @@ var Hands = (function () {
             var ls = longestSequence(mostCommonSuits[0]);
             if (ls.length >= 5) {
                 var highestCard = getHighestCard(ls);
-                var secondHighestCard = getHighestCard(difference(ls, highestCard));
+                var secondHighestCard = getHighestCard(difference(ls, [highestCard]));
                 if (highestCard.rank === "A" && secondHighestCard.rank != "K") {
                     ls = sort(ls, true);
                     hand = ls.slice(-5);

@@ -190,16 +190,17 @@ var UserController = function (player, root) {
 
         } else if (e instanceof GameEndEvent) {
 
-            Object.keys(e.result).forEach(function (key, i) {
-                console.log(e.result[key].player);
-                var ele = document.querySelector("[name=" + e.result[key].player + "]");
-                for (var card of e.result[key].hand) {
-                    ele.appendChild(card.getImage());
-                }
-                ele.append(e.result[key].score);
-                console.log(e.result[key].score);
-            });
-
+            if (e.result) {
+                Object.keys(e.result).forEach(function (key, i) {
+                    console.log(e.result[key].player);
+                    var ele = document.querySelector("[name=" + e.result[key].player + "]");
+                    for (var card of e.result[key].hand) {
+                        ele.appendChild(card.getImage());
+                    }
+                    ele.append(e.result[key].score);
+                    console.log(e.result[key].score);
+                });
+            }
         }
     }
 

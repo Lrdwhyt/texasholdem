@@ -8,14 +8,18 @@ var AIController = function (player) {
         if (e instanceof BettingPreflopAwaitEvent) {
 
             if (e.player === player) {
-                e.callback(player, Bets.CALL);
+                if (Math.random() > 0.9) {
+                    e.callback(player, Bets.RAISE, 5);
+                } else {
+                    e.callback(player, Bets.CALL);
+                }
             }
 
         } else if (e instanceof BettingFlopAwaitEvent) {
 
             if (e.player === player) {
                 if (Math.random() > 0.9) {
-                    e.callback(player, Bets.RAISE, 1);
+                    e.callback(player, Bets.RAISE, 5);
                 } else {
                     e.callback(player, Bets.CALL);
                 }
@@ -24,13 +28,21 @@ var AIController = function (player) {
         } else if (e instanceof BettingTurnAwaitEvent) {
 
             if (e.player === player) {
-                e.callback(player, Bets.CALL);
+                if (Math.random() > 0.9) {
+                    e.callback(player, Bets.RAISE, 5);
+                } else {
+                    e.callback(player, Bets.CALL);
+                }
             }
 
         } else if (e instanceof BettingRiverAwaitEvent) {
 
             if (e.player === player) {
-                e.callback(player, Bets.CALL);
+                if (Math.random() > 0.9) {
+                    e.callback(player, Bets.RAISE, 5);
+                } else {
+                    e.callback(player, Bets.CALL);
+                }
             }
 
         }

@@ -27,6 +27,7 @@ var OfflineMatch = function () {
         }
 
         if (e instanceof GameEndEvent) {
+            game = null;
             for (let i = players.length - 1; i >= 0; --i) {
                 if (players[i].getMoney() <= 0) {
                     players.splice(i, 1);
@@ -37,7 +38,7 @@ var OfflineMatch = function () {
     }
 
     var startGame = function () {
-        if (players.length >= 2) {
+        if (players.length >= 2 && (game === undefined || game === null)) {
             game = new Game(players, buttonPosition, dispatchEvent);
         }
     }
@@ -123,7 +124,6 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     var processBet = function (player, type, amount) {
         // TODO: check that bet is valid
-        currentPlayer = getNextPlayer(player);
         if (type == Bets.CALL) {
             var toCallDifference = currentBet - bets[player.getName()];
             if (player.getMoney() >= toCallDifference) {
@@ -155,7 +155,7 @@ var Game = function (matchPlayers, button, matchCallback) {
                 modMoney(player, -toRaiseDifference);
             } else {
                 // invalid raise amount
-                return;
+                return false;
             }
 
         } else if (type == Bets.FOLD) {
@@ -175,8 +175,13 @@ var Game = function (matchPlayers, button, matchCallback) {
             return;
         }
         //Bet
-        dispatchEvent(new BettingPreflopBetEvent(player, type, amount));
-        processBet(player, type, amount);
+        if (processBet(player, type, amount) === false) {
+            dispatchEvent(new BettingPreflopAwaitEvent(currentPlayer, betPreflop, bets[currentPlayer], currentBet));
+            return;
+        } else {
+            dispatchEvent(new BettingPreflopBetEvent(player, type, amount));
+            currentPlayer = getNextPlayer(player);
+        }
         if (player != lastPlayer) {
             dispatchEvent(new BettingPreflopAwaitEvent(currentPlayer, betPreflop, bets[currentPlayer], currentBet));
         } else {
@@ -191,8 +196,13 @@ var Game = function (matchPlayers, button, matchCallback) {
             return;
         }
         //Bet
-        dispatchEvent(new BettingFlopBetEvent(player, type, amount));
-        processBet(player, type, amount);
+        if (processBet(player, type, amount) === false) {
+            dispatchEvent(new BettingFlopAwaitEvent(currentPlayer, betFlop, bets[currentPlayer], currentBet));
+            return;
+        } else {
+            dispatchEvent(new BettingFlopBetEvent(player, type, amount));
+            currentPlayer = getNextPlayer(player);
+        }
         // Bet successfully processed
         if (player != lastPlayer) {
             dispatchEvent(new BettingFlopAwaitEvent(currentPlayer, betFlop, bets[currentPlayer], currentBet));
@@ -208,8 +218,13 @@ var Game = function (matchPlayers, button, matchCallback) {
             return;
         }
         //Bet
-        dispatchEvent(new BettingTurnBetEvent(player, type, amount));
-        processBet(player, type, amount);
+        if (processBet(player, type, amount) === false) {
+            dispatchEvent(new BettingTurnAwaitEvent(currentPlayer, betTurn, bets[currentPlayer], currentBet));
+            return;
+        } else {
+            dispatchEvent(new BettingTurnBetEvent(player, type, amount));
+            currentPlayer = getNextPlayer(player);
+        }
         if (player != lastPlayer) {
             dispatchEvent(new BettingTurnAwaitEvent(currentPlayer, betTurn, bets[currentPlayer], currentBet));
         } else {
@@ -224,8 +239,13 @@ var Game = function (matchPlayers, button, matchCallback) {
             return;
         }
         //Bet
-        dispatchEvent(new BettingRiverBetEvent(player, type, amount));
-        processBet(player, type, amount);
+        if (processBet(player, type, amount) === false) {
+            dispatchEvent(new BettingRiverAwaitEvent(currentPlayer, betRiver, bets[currentPlayer], currentBet));
+            return;
+        } else {
+            dispatchEvent(new BettingRiverBetEvent(player, type, amount));
+            currentPlayer = getNextPlayer(player);
+        }
         if (player != lastPlayer) {
             dispatchEvent(new BettingRiverAwaitEvent(currentPlayer, betRiver, bets[currentPlayer], currentBet));
         } else {
