@@ -4,6 +4,7 @@
 <head>
     <title>Texas Hold 'Em</title>
     <!--stylesheet-->
+    <link rel="stylesheet" type="text/css" href="offlinestyle.css">
     <script type="text/javascript" src="cards.js"></script>
     <script type="text/javascript" src="texasholdem.js"></script>
     <script type="text/javascript" src="Player.js"></script>
@@ -14,10 +15,14 @@
 
 <body>
     <div id="container">
+        <div id="match-controls">
+            <button id="next-game">Next game</button>
+        </div>
+        <div id="players"></div>
+        <div id="board"></div>
         <div id="user">
             <div id="user-cards"></div>
             <div id="hand"></div>
-            <div id="board"></div>
             Bet
             <input type="text" id="bet">
             <span id="actions">

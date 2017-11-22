@@ -17,14 +17,23 @@ var OfflineMatch = function () {
     }
 
     var dispatchEvent = function (e) {
+        if (e instanceof DealtHandEvent) {
+            e.player.getController().dispatchEvent(e);
+            return;
+        }
+
+        for (let player of players) {
+            player.getController().dispatchEvent(e);
+        }
+
         if (e instanceof GameEndEvent) {
             for (let i = players.length - 1; i >= 0; --i) {
                 if (players[i].getMoney() <= 0) {
                     players.splice(i, 1);
                 }
             }
-            //setTimeout(startGame, 5000);
         }
+
     }
 
     var startGame = function () {
@@ -41,21 +50,24 @@ var OfflineMatch = function () {
 
 };
 
-var Game = function (players, button, matchCallback) {
+var MatchController = function (match) {
+    var match;
+    document.getElementById("match-controls").addEventListener("click", function (e) {
+        if (e.target.id === "next-game") {
+            match.startGame();
+        }
+    });
+}
+
+var Game = function (matchPlayers, button, matchCallback) {
 
     var dispatchEvent = function (e) {
-        if (e instanceof DealtHandEvent) {
-            e.player.getController().dispatchEvent(e);
-            return;
-        }
+        matchNotify(e);
+    }
 
-        if (e instanceof GameEndEvent) {
-            matchNotify(e);
-        }
-
-        for (let player of players) {
-            player.getController().dispatchEvent(e);
-        }
+    var modMoney = function (player, money) {
+        player.modMoney(money);
+        dispatchEvent(new PlayerMoneyChangeEvent(player, money));
     }
 
     var processPot = function (participants) {
@@ -81,10 +93,10 @@ var Game = function (players, button, matchCallback) {
             }
         }
         if (winners.length === 1) {
-            winners[0].modMoney(pot);
+            modMoney(winners[0], pot);
         } else { // Split pot
             for (var player of winners) {
-                player.modMoney(parseInt(pot / winners.length));
+                modMoney(player, parseInt(pot / winners.length));
             }
         }
         return results;
@@ -109,6 +121,55 @@ var Game = function (players, button, matchCallback) {
         }
     }
 
+    var processBet = function (player, type, amount) {
+        // TODO: check that bet is valid
+        currentPlayer = getNextPlayer(player);
+        if (type == Bets.CALL) {
+            var toCallDifference = currentBet - bets[player.getName()];
+            if (player.getMoney() >= toCallDifference) {
+                pot += toCallDifference;
+                bets[player.getName()] += toCallDifference;
+                modMoney(player, -toCallDifference);
+            } else {
+                // TODO: All-in, create side pots
+                pot += player.getMoney();
+                modMoney(player, -player.getMoney());
+                bets[player.getName()] += player.getMoney();
+            }
+        } else if (type === Bets.CHECK) {
+            if (currentBet === bets[player.getName()]) {
+                // Valid bet
+            } else {
+                // Can't check
+                console.log("invalid check");
+                return false;
+            }
+        } else if (type == Bets.RAISE) {
+            var toRaiseDifference = currentBet - bets[player.getName()] + amount;
+            if (amount > 0 && player.getMoney() >= toRaiseDifference) {
+                // Valid raise
+                lastPlayer = getPrevPlayer(player);
+                currentBet += amount;
+                bets[player.getName()] += toRaiseDifference;
+                pot += toRaiseDifference;
+                modMoney(player, -toRaiseDifference);
+            } else {
+                // invalid raise amount
+                return;
+            }
+
+        } else if (type == Bets.FOLD) {
+            if (firstPlayer === player) {
+                firstPlayer = getPrevPlayer(player);
+            }
+            players.splice(players.indexOf(player), 1);
+            if (players.length === 1) {
+                //Only one player left, who wins by default
+                dispatchEvent(new GameEndEvent());
+            }
+        }
+    }
+
     var betPreflop = function (player, type, amount) {
         if (player != currentPlayer) {
             return;
@@ -124,54 +185,6 @@ var Game = function (players, button, matchCallback) {
             dealFlop();
         }
     };
-
-    var processBet = function (player, type, amount) {
-        // TODO: check that bet is valid
-        currentPlayer = getNextPlayer(player);
-        if (type == Bets.CALL) {
-            var toCallDifference = currentBet - bets[player.getName()];
-            if (player.getMoney() >= toCallDifference) {
-                pot += toCallDifference;
-                bets[player.getName()] += toCallDifference;
-                player.modMoney(-toCallDifference);
-            } else {
-                // TODO: All-in, create side pots
-                pot += player.getMoney();
-                player.modMoney(-player.getMoney());
-                bets[player.getName()] += player.getMoney();
-            }
-        } else if (type === Bets.CHECK) {
-            if (currentBet === bets[player.getName()]) {
-                // Valid bet
-            } else {
-                // Can't check
-                return;
-            }
-        } else if (type == Bets.RAISE) {
-            var toRaiseDifference = currentBet - bets[player.getName()] + amount;
-            if (amount > 0 && player.getMoney() >= toRaiseDifference) {
-                // Valid raise
-                lastPlayer = getPrevPlayer(player);
-                currentBet += amount;
-                bets[player.getName()] += toRaiseDifference;
-                pot += toRaiseDifference;
-                player.modMoney(-toRaiseDifference);
-            } else {
-                // invalid raise amount
-                return;
-            }
-
-        } else if (type == Bets.FOLD) {
-            if (firstPlayer === player) {
-                firstPlayer = getPrevPlayer(player);
-            }
-            players.remove(player);
-            if (players.length === 1) {
-                //Only one player left, who wins by default
-                dispatchEvent(new GameEndEvent());
-            }
-        }
-    }
 
     var betFlop = function (player, type, amount) {
         if (player != currentPlayer) {
@@ -231,12 +244,14 @@ var Game = function (players, button, matchCallback) {
     };
 
     var dealTurn = function () {
+        deck.pop();
         turn.push(deck.deal());
         dispatchEvent(new DealtTurnEvent(turn));
         dispatchEvent(new BettingTurnAwaitEvent(currentPlayer, betTurn));
     }
 
     var dealRiver = function () {
+        deck.pop();
         river.push(deck.deal());
         dispatchEvent(new DealtRiverEvent(river));
         dispatchEvent(new BettingRiverAwaitEvent(currentPlayer, betRiver));
@@ -253,7 +268,7 @@ var Game = function (players, button, matchCallback) {
 
     var deck = new Deck();
     deck.shuffle();
-    var players;
+    var players = matchPlayers.slice(0);
     var flop = [];
     var turn = [];
     var river = [];
@@ -291,7 +306,7 @@ var DealtHandEvent = function (player, hand) {
     this.hand = hand;
 }
 
-var PlayerMoneyChange = function (player, change) {
+var PlayerMoneyChangeEvent = function (player, change) {
     this.player = player;
     this.change = change;
 };

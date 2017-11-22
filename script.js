@@ -1,6 +1,7 @@
 (function () {
     window.onload = function () {
         var m = new OfflineMatch();
+        var mc = new MatchController(m);
 
 
         var p1 = new Player("Deirdre", 100);

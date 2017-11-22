@@ -88,13 +88,23 @@ var UserController = function (player, root) {
     var resetUI = function () {
         document.getElementById("user-cards").innerHTML = "";
         document.getElementById("board").innerHTML = "";
+        document.getElementById("players").innerHTML = "";
     }
 
-    var drawBoard = function(players) {
+    var drawBoard = function (players) {
         for (let player of players) {
             var playerRoot = document.createElement("div");
             playerRoot.setAttribute("name", player.getName());
-            root.appendChild(playerRoot);
+            playerRoot.className = "player";
+            var name = document.createElement("div");
+            name.className = "name";
+            name.textContent = player.getName();
+            var money = document.createElement("div");
+            money.className = "money";
+            money.textContent = player.getMoney();
+            playerRoot.appendChild(name);
+            playerRoot.appendChild(money);
+            document.getElementById("players").appendChild(playerRoot);
         }
     }
 
@@ -102,9 +112,12 @@ var UserController = function (player, root) {
     var dispatchEvent = function (e) {
 
         if (e instanceof GameStartEvent) {
-            
+
             resetUI();
             drawBoard(e.players);
+
+        } else if (e instanceof PlayerMoneyChangeEvent) {
+            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = e.player.getMoney();
 
         } else if (e instanceof DealtHandEvent) {
 
@@ -113,8 +126,6 @@ var UserController = function (player, root) {
             }
 
         } else if (e instanceof BettingPreflopAwaitEvent) {
-            console.log(e.player === player);
-
             if (e.player === player) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
@@ -132,7 +143,6 @@ var UserController = function (player, root) {
             }
 
         } else if (e instanceof BettingFlopAwaitEvent) {
-
             if (e.player === player) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
