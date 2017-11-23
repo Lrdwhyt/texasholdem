@@ -158,7 +158,6 @@ var Game = function (matchPlayers, button, matchCallback) {
             previousBaseline = b;
             results.push(newPot);
         }
-        console.log(JSON.stringify(baselines));
         results.push(new Pot());
         pots = results;
         updatePots(); // Redistribute pots
@@ -186,8 +185,6 @@ var Game = function (matchPlayers, button, matchCallback) {
                 }
             }
         }
-        console.log(JSON.stringify(bets));
-        console.log(JSON.stringify(pots));
         dispatchEvent(new PotChangeEvent(pots));
     }
 
@@ -240,7 +237,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
             case BetType.RAISE:
                 let toCallDifference = currentBet - bets[player.getName()];
-                if (player.getMoney() >= bet.amount && bet.amount > toCallDifference) {
+                if (player.getMoney() >= bet.amount && (bet.amount > toCallDifference + minRaise || bet.amount === player.getMoney())) {
                     return true;
                 } else {
                     return false;
@@ -292,6 +289,9 @@ var Game = function (matchPlayers, button, matchCallback) {
             case BetType.RAISE:
                 lastRaiser = player;
                 lastPlayer = getPrevPlayer(lastRaiser);
+                if (bet.amount - currentBet > minRaise) {
+                    minRaise = bet.amount - currentBet;
+                }
                 currentBet += bet.amount - (currentBet - bets[player.getName()]);
                 bets[player.getName()] += bet.amount;
                 if (bet.amount === player.getMoney()) { // Player raises to all-in
@@ -446,6 +446,7 @@ var Game = function (matchPlayers, button, matchCallback) {
     var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
     var lastRaiser = null;
     var currentBet = ante;
+    let minRaise = ante * 2;
 
     deductAntes(ante);
 

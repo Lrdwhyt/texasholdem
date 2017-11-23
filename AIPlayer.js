@@ -12,12 +12,12 @@ var calculateAction = function (cards, board, currentBet, committed, money) {
     let toCall = currentBet - committed;
     
     if (toCall === 0) {
-        if (score < 535000 && board.length === 5) {
+        if (score < 540000 && board.length === 5) {
             return new Bet(BetType.CHECK);
-        } else if (score < 600000) {
+        } else if (score < 570000) {
             return new Bet(BetType.CHECK);
         } else {
-            return new Bet(BetType.RAISE, parseInt((score - 550000) / 5000000 * money));
+            return new Bet(BetType.RAISE, parseInt((score - 570000) / 5000000 * money));
         }
     } else {
         if (score < 500000) {
@@ -27,7 +27,7 @@ var calculateAction = function (cards, board, currentBet, committed, money) {
                 return new Bet(BetType.CALL);
             }
         } else if (score < 535000) {
-            if (toCall > committed * 2 - + money * 0.01) {
+            if (toCall > committed * 2 - money * 0.01) {
                 return new Bet(BetType.FOLD);
             } else {
                 return new Bet(BetType.CALL);

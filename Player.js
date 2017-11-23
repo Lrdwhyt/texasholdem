@@ -52,6 +52,7 @@ var UserController = function (player, root) {
     var callbackFunction;
     var player;
     var root;
+    let toCall = 0;
 
     console.log("Game started");
     root.querySelector("#actions").addEventListener("click", function (e) {
@@ -72,7 +73,11 @@ var UserController = function (player, root) {
             case "all-in":
                 var callback = callbackFunction;
                 callbackFunction = null;
-                callback(player, new Bet(BetType.RAISE, player.getMoney()));
+                if (toCall > player.getMoney()) {
+                    callback(player, new Bet(BetType.CALL));
+                } else {
+                    callback(player, new Bet(BetType.RAISE, player.getMoney()));
+                }
                 break;
 
             case "fold":
@@ -112,7 +117,7 @@ var UserController = function (player, root) {
         }
     }
 
-    var updatePot = function(pots) {
+    var updatePot = function (pots) {
 
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
 
@@ -131,6 +136,7 @@ var UserController = function (player, root) {
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
             document.querySelector("[name=" + e.player.getName() + "] .money").textContent = e.player.getMoney();
+            console.log(e.player.getName() + " money changed: " + e.change);
 
         } else if (e instanceof DealtHandEvent) {
 
@@ -142,13 +148,14 @@ var UserController = function (player, root) {
             if (e.player === player) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
+                toCall = e.current - e.committed;
             }
 
         } else if (e instanceof BetMadeEvent) {
 
             let msg = "";
 
-            switch(e.bet.type) {
+            switch (e.bet.type) {
                 case BetType.RAISE:
                     msg = e.player.getName() + " raised to " + e.bet.amount;
                     break;
@@ -181,18 +188,21 @@ var UserController = function (player, root) {
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
+            console.log("Flop dealt")
 
         } else if (e instanceof DealtTurnEvent) {
 
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
+            console.log("Turn dealt")
 
         } else if (e instanceof DealtRiverEvent) {
 
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
+            console.log("River dealt")
 
         } else if (e instanceof GameEndEvent) {
 
