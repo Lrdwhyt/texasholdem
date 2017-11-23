@@ -112,8 +112,13 @@ var UserController = function (player, root) {
         }
     }
 
-    var updatePot = function(pot) {
-        //console.log(pot.baseline);
+    var updatePot = function(pots) {
+
+        if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
+
+        } else {
+
+        }
     }
 
     //Allows game to notify player of events
@@ -141,29 +146,50 @@ var UserController = function (player, root) {
 
         } else if (e instanceof BetMadeEvent) {
 
-            console.log(e.player.getName() + " bet " + e.bet.type + ", " + e.bet.amount);
+            let msg = "";
+
+            switch(e.bet.type) {
+                case BetType.RAISE:
+                    msg = e.player.getName() + " raised to " + e.bet.amount;
+                    break;
+
+                case BetType.CALL:
+                    msg = e.player.getName() + " called";
+                    break;
+
+                case BetType.CHECK:
+                    msg = e.player.getName() + " checked"
+                    break;
+
+                case BetType.FOLD:
+                    msg = e.player.getName() + " folded";
+                    break;
+
+                default:
+                    msg = e.player.getName() + " made an unrecognised action";
+                    break;
+            }
+
+            console.log(msg);
 
         } else if (e instanceof PotChangeEvent) {
-            for (let pot in e.pots) {
-                updatePot(pot);
-            }
+
+            updatePot(e.pots);
+
         } else if (e instanceof DealtFlopEvent) {
 
-            console.log("Flop" + e.cards);
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
 
         } else if (e instanceof DealtTurnEvent) {
 
-            console.log(e.cards);
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
 
         } else if (e instanceof DealtRiverEvent) {
 
-            console.log(e.cards);
             for (var card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
@@ -172,13 +198,11 @@ var UserController = function (player, root) {
 
             if (e.result) {
                 Object.keys(e.result).forEach(function (key, i) {
-                    console.log(e.result[key].player);
                     var ele = document.querySelector("[name=" + e.result[key].player + "]");
                     for (var card of e.result[key].hand) {
                         ele.appendChild(card.getImage());
                     }
                     ele.append(e.result[key].score);
-                    console.log(e.result[key].score);
                 });
             }
         }

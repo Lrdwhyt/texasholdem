@@ -11,7 +11,8 @@ var BettingStage = {
     PREFLOP: 1,
     FLOP: 2,
     TURN: 3,
-    RIVER: 4
+    RIVER: 4,
+    COMPLETE: 5
 };
 
 var OfflineMatch = function () {
@@ -113,7 +114,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         var winners = [];
         var bestScore = 0;
         var bestHand;
-        for (var player of pot.players) {
+        for (let player of pot.players) {
             var playerHand = Hands.bestHand(player.getHand().concat(flop).concat(turn).concat(river));
             var playerScore = playerHand.score;
             results[player.getName()] = {
@@ -147,16 +148,17 @@ var Game = function (matchPlayers, button, matchCallback) {
 
         baselines.push(baseline);
         baselines.sort(function (a, b) {
-            return b - a; // Low to high
+            return a - b; // Low to high
         });
         let results = [];
-        let cumulativeBaselines = 0;
-        for (let p of baselines) {
+        let previousBaseline = 0;
+        for (let b of baselines) {
             let newPot = new Pot();
-            newPot.baseline = p - cumulativeBaselines;
-            cumulativeBaselines += p;
+            newPot.baseline = b - previousBaseline;
+            previousBaseline = b;
             results.push(newPot);
         }
+        console.log(JSON.stringify(baselines));
         results.push(new Pot());
         pots = results;
         updatePots(); // Redistribute pots
@@ -182,49 +184,26 @@ var Game = function (matchPlayers, button, matchCallback) {
                 }
             }
         }
-    }
-
-    var constructPots = function () {
-        sorted = sort(playerBets(function () { b.bet - a.bet }));
-        let lastPot;
-        let unaccounted = [];
-        let result;
-        let cPot;
-        for (p of sorted) {
-            if (lastPot > 0 && lastPot === p.money) {
-                cPot.players.push(p)
-            } else if (p.money === 0 && p.isNotFolded) {
-                cPot = createNewPot()
-                cPot.players = unaccounted;
-                cPot.players.push(p);
-                result.push(cPot);
-                cPot.baseline = p.money
-                lastPot = p.money
-                everyoneAfter.bet -= cPot.baseline
-            } else if (p.isNotFolded) {
-                unaccounted.push(p)
-            }
-        }
-        return result;
+        console.log(JSON.stringify(pots));
+        dispatchEvent(new PotChangeEvent(pots));
     }
 
     var deductAntes = function (ante) {
         for (let player of players) {
             if (player.getMoney() >= ante) {
-                if (player.getMoney() === ante) {
-                    addBaseline(ante);
-                }
-                modMoney(player, -ante);
                 bets[player.getName()] += ante;
-            } else { // Not enough to cover ante!
-                if (player.getMoney() === ante) {
-                    addBaseline(player.getMoney());
+                modMoney(player, -ante);
+                if (player.getMoney() === 0) {
+                    addBaseline(bets[player.getName()]);
+                    removeFromBetting(player);
                 }
-                modMoney(player, -player.getMoney());
+            } else { // Not enough money to cover ante
                 bets[player.getName()] += player.getMoney();
+                modMoney(player, -player.getMoney());
+                addBaseline(bets[player.getName()]);
+                removeFromBetting(player);
             }
         }
-        dispatchEvent(new PotChangeEvent(pots));
     }
 
     var getNextPlayer = function (player) {
@@ -279,59 +258,54 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     }
 
+    var removeFromBetting = function (player) {
+        if (player === lastPlayer) {
+            lastPlayer = getPrevPlayer(lastRaiser);
+        }
+        bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
+        if (bettingPlayers.length === 1 && bets[bettingPlayers[0].getName()] === currentBet) {
+            bettingPlayers.pop();
+        }
+    }
+
     var processBet = function (player, bet) {
         switch (bet.type) {
             case BetType.CALL:
                 var toCallDifference = currentBet - bets[player.getName()];
-                if (player.getMoney() >= toCallDifference) {
+                if (player.getMoney() > toCallDifference) {
                     bets[player.getName()] += toCallDifference;
                     modMoney(player, -toCallDifference);
-                } else {
-                    // TODO: All-in, create side pots
+                } else { // Player is all-in
                     bets[player.getName()] += player.getMoney();
                     modMoney(player, -player.getMoney());
                     addBaseline(bets[player.getName()]);
-                    bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
-                    if (bettingPlayers.length === 1) {
-                        //Only one player left
-                        dispatchEvent(new GameEndEvent());
-                    }
+                    removeFromBetting(player);
                 }
-                dispatchEvent(new PotChangeEvent(pots));
                 break;
 
             case BetType.CHECK:
                 break;
 
             case BetType.RAISE:
-                lastPlayer = getPrevPlayer(player);
+                lastRaiser = player;
+                lastPlayer = getPrevPlayer(lastRaiser);
                 currentBet += bet.amount - (currentBet - bets[player.getName()]);
                 bets[player.getName()] += bet.amount;
-                if (bet.amount === player.getMoney()) {
+                if (bet.amount === player.getMoney()) { // Player raises to all-in
                     addBaseline(bets[player.getName()]);
-                    bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
-                    if (bettingPlayers.length === 1) {
-                        //Only one player left
-                        dispatchEvent(new GameEndEvent());
-                    }
+                    removeFromBetting(player);
                 }
                 modMoney(player, -bet.amount);
-                dispatchEvent(new PotChangeEvent(pots));
                 break;
 
             case BetType.FOLD:
                 if (firstPlayer === player) {
                     firstPlayer = getPrevPlayer(player);
                 }
-                bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
+                removeFromBetting(player);
                 unfoldedPlayers.splice(unfoldedPlayers.indexOf(player), 1);
                 for (let pot of pots) { // Folded players not eligible for pots
                     pot.remove(player);
-                }
-                // TODO: Remove player from pots
-                if (bettingPlayers.length === 1) {
-                    //Only one player left
-                    dispatchEvent(new GameEndEvent());
                 }
                 break;
         }
@@ -343,24 +317,40 @@ var Game = function (matchPlayers, button, matchCallback) {
         flop.push(deck.deal());
         flop.push(deck.deal());
         dispatchEvent(new DealtFlopEvent(flop));
-        bettingStage = BettingStage.FLOP;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
     };
 
     var dealTurn = function () {
         deck.pop();
         turn.push(deck.deal());
         dispatchEvent(new DealtTurnEvent(turn));
-        bettingStage = BettingStage.TURN;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
     }
 
     var dealRiver = function () {
         deck.pop();
         river.push(deck.deal());
         dispatchEvent(new DealtRiverEvent(river));
-        bettingStage = BettingStage.RIVER;
-        dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
+    }
+
+    var finish = function () {
+        if (bettingStage !== BettingStage.RIVER) {
+            switch (bettingStage) {
+                case BettingStage.PREFLOP:
+                    dealFlop();
+                case BettingStage.FLOP:
+                    dealTurn();
+                case BettingStage.TURN:
+                    dealRiver();
+            }
+        }
+        let result = null;
+        for (let index in pots) {
+            if (index === "0") {
+                result = processPot(pots[index]);
+            } else {
+                processPot(pots[index]);
+            }
+        }
+        dispatchEvent(new GameEndEvent(result));
     }
 
     var makeBet = function (player, bet) {
@@ -376,29 +366,36 @@ var Game = function (matchPlayers, button, matchCallback) {
         updatePots();
         dispatchEvent(new BetMadeEvent(player, bet));
 
+        if (bettingPlayers.length === 0 || unfoldedPlayers.length === 1) {
+            //Only one player left
+            finish();
+            return;
+        }
+
         if (player === lastPlayer) {
             switch (bettingStage) {
                 case BettingStage.PREFLOP:
                     dealFlop();
+                    bettingStage = BettingStage.FLOP;
                     break;
 
                 case BettingStage.FLOP:
                     dealTurn();
+                    bettingStage = BettingStage.TURN;
                     break;
 
                 case BettingStage.TURN:
                     dealRiver();
+                    bettingStage = BettingStage.RIVER;
                     break;
 
                 case BettingStage.RIVER:
-                    for (pot of pots) {
-                        processPot(pot);
-                    }
-                    //dispatchEvent(new GameEndEvent(processPot(mainPot)));
-                    dispatchEvent(new GameEndEvent());
+                    bettingStage = BettingStage.COMPLETE;
+                    finish();
                     break;
             }
-        } else {
+        }
+        if (bettingStage !== BettingStage.COMPLETE) {
             dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
         }
     }
@@ -440,7 +437,14 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     dispatchEvent(new GameStartEvent(players));
 
-    deductAntes(5);
+    let ante = 20;
+    var firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
+    var currentPlayer = firstPlayer;
+    var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
+    var lastRaiser = null;
+    var currentBet = ante;
+
+    deductAntes(ante);
 
     deal();
 
@@ -448,14 +452,9 @@ var Game = function (matchPlayers, button, matchCallback) {
         dispatchEvent(new DealtHandEvent(player, player.getHand()));
     }
 
-    var firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
-    var currentPlayer = firstPlayer;
-    var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
-    var currentBet = 0;
-
     bettingStage = BettingStage.PREFLOP;
 
-    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, 0, bets[currentPlayer.getName()]));
+    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
 
 }
 

@@ -1,3 +1,15 @@
+var HandCombinations = {
+    HIGH_CARD: 0,
+    ONE_PAIR: 1,
+    TWO_PAIR: 2,
+    THREE_OF_A_KIND: 3,
+    STRAIGHT: 4,
+    FLUSH: 5,
+    FULL_HOUSE: 6,
+    FOUR_OF_A_KIND: 7,
+    STRAIGHT_FLUSH: 8
+};
+
 var Deck = function () {
     var cards = [];
     for (var suit of ["S", "H", "D", "C"]) {
@@ -273,10 +285,10 @@ var Hands = (function () {
                     hand = getNHighestCards(ls, 5);
                     score = 8 * Math.pow(14, 5) + highestCard.rankNumber();
                 }
-                console.log("STRAIGHT FLUSH");
                 return {
                     hand: hand,
-                    score: score
+                    score: score,
+                    type: HandCombinations.STRAIGHT_FLUSH
                 };
             }
         }
@@ -286,10 +298,10 @@ var Hands = (function () {
             var kicker = getNHighestCards(difference(cards, quad), 1);
             hand = quad.concat(kicker);
             score = 7 * Math.pow(14, 5) + quad[0].rankNumber() * 14 + kicker[0].rankNumber();
-            console.log("FOUR OF A KIND");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.FOUR_OF_A_KIND
             };
         } else if (mostCommonRanks[0].length === 3 && mostCommonRanks[1].length >= 2) { // Full house
             var triple = mostCommonRanks[0];
@@ -301,18 +313,18 @@ var Hands = (function () {
             }
             hand = triple.concat(pair);
             score = 6 * Math.pow(14, 5) + triple[0].rankNumber() * 14 + pair[0].rankNumber();
-            console.log("FULL HOUSE");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.FULL_HOUSE
             };
         } else if (largestSuit.length >= 5) { // Flush
-            console.log("FLUSH");
             hand = getNHighestCards(largestSuit, 5);
             score = 5 * Math.pow(14, 5) + getScore(hand);
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.FLUSH
             };
         } else if (longestStraight.length >= 5) { // Straight
             var highestCard = getHighestCard(longestStraight);
@@ -325,20 +337,20 @@ var Hands = (function () {
                 hand = getNHighestCards(longestStraight, 5);
                 score = 4 * Math.pow(14, 5) + highestCard.rankNumber();
             }
-            console.log("STRAIGHT");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.STRAIGHT
             };
         } else if (mostCommonRanks[0].length === 3) { // Three of a kind
             var triple = mostCommonRanks[0];
             var kickers = getNHighestCards(difference(cards, triple), 2);
             hand = triple.concat(kickers);
             score = 3 * Math.pow(14, 5) + triple[0].rankNumber() * Math.pow(14, 3) + getScore(kickers);
-            console.log("THREE OF A KIND");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.THREE_OF_A_KIND
             };
         } else if (mostCommonRanks[0].length === 2 && mostCommonRanks[1].length === 2) { // Two pair
             var highPair;
@@ -358,28 +370,28 @@ var Hands = (function () {
             var kicker = getHighestCard(remainder)
             hand.push(kicker);
             score = 2 * Math.pow(14, 5) + highPair[0].rankNumber() * Math.pow(14, 2) + lowPair[0].rankNumber() * Math.pow(14, 1) + kicker.rankNumber();
-            console.log("TWO PAIR");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.TWO_PAIR
             };
         } else if (mostCommonRanks[0].length === 2) { // One pair
             var pair = mostCommonRanks[0];
             var kickers = getNHighestCards(difference(cards, pair), 3);
             hand = pair.concat(kickers);
             score = Math.pow(14, 5) + pair[0].rankNumber() * Math.pow(14, 3) + getScore(kickers);
-            console.log("ONE PAIR");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.ONE_PAIR
             };
-        } else /*if (mostCommonRanks[0].length === 1)*/ { // High card
+        } else { // High card
             hand = getNHighestCards(cards, 5);
             score = getScore(hand);
-            console.log("X HIGH");
             return {
                 hand: hand,
-                score: score
+                score: score,
+                type: HandCombinations.HIGH_CARD
             };
         }
 
