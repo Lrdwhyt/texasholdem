@@ -112,6 +112,10 @@ var UserController = function (player, root) {
         }
     }
 
+    var updatePot = function(pot) {
+        //console.log(pot.baseline);
+    }
+
     //Allows game to notify player of events
     var dispatchEvent = function (e) {
 
@@ -139,6 +143,10 @@ var UserController = function (player, root) {
 
             console.log(e.player.getName() + " bet " + e.bet.type + ", " + e.bet.amount);
 
+        } else if (e instanceof PotChangeEvent) {
+            for (let pot in e.pots) {
+                updatePot(pot);
+            }
         } else if (e instanceof DealtFlopEvent) {
 
             console.log("Flop" + e.cards);
