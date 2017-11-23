@@ -34,6 +34,10 @@ var Deck = function () {
     this.pop = function () {
         cards.pop();
     };
+
+    this.getCards = function() {
+        return cards;
+    };
 };
 
 Deck.prototype.shuffle = function () { };
@@ -400,7 +404,8 @@ var Hands = (function () {
     return {
         bestHand: bestHand,
         getScore: getScore,
-        Types: Types
+        Types: Types,
+        difference: difference
     };
 
 })();

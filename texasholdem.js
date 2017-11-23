@@ -166,9 +166,6 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     var updatePots = function () { // Distribute players and their bets according to pot baselines
         for (let player of players) {
-            if (unfoldedPlayers.indexOf(player) === -1) {
-                continue; // Player is not eligible for pots
-            }
             if (pots.length === 1) { // No side pots
                 pots[0].add(player, bets[player.getName()]);
             } else {
@@ -183,7 +180,13 @@ var Game = function (matchPlayers, button, matchCallback) {
                     }
                 }
             }
+            if (unfoldedPlayers.indexOf(player) === -1) {
+                for (let pot of pots) { // Player is not eligible for pots and should be removed
+                    pot.remove(player);
+                }
+            }
         }
+        console.log(JSON.stringify(bets));
         console.log(JSON.stringify(pots));
         dispatchEvent(new PotChangeEvent(pots));
     }
