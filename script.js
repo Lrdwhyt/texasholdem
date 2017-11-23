@@ -1,5 +1,5 @@
 (function () {
-    window.onload = function () {
+    var startMatch = function() {
         var m = new OfflineMatch();
         var mc = new MatchController(m);
 
@@ -19,7 +19,11 @@
         var p4 = new Player("Zephyr", 3300);
         p4.setController(new AIController(p4));
         m.addPlayer(p4);
-        
+
         m.startGame();
+    };
+
+    window.onload = function () {
+        startMatch();
     }
 })();

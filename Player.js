@@ -145,6 +145,8 @@ var UserController = function (player, root) {
             }
 
         } else if (e instanceof BetAwaitEvent) {
+
+            //TODO: Fade out/disable invalid bet options
             if (e.player === player) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
@@ -209,10 +211,12 @@ var UserController = function (player, root) {
             if (e.result) {
                 Object.keys(e.result).forEach(function (key, i) {
                     var ele = document.querySelector("[name=" + e.result[key].player + "]");
-                    for (var card of e.result[key].hand) {
+                    for (var card of e.result[key].cards) {
                         ele.appendChild(card.getImage());
                     }
-                    ele.append(e.result[key].score);
+                    let score = document.createElement("div");
+                    score.textContent = e.result[key].score;
+                    ele.appendChild(score);
                 });
             }
         }

@@ -1,0 +1,25 @@
+.name {
+    font-weight: bold;
+}
+
+.player {
+    display: inline-block;
+    margin: 10px;
+    min-width: 70px;
+}
+
+.player img {
+    width: 70px;
+}
+
+#board img {
+    margin: 0 5px;
+    width: 120px;
+}
+
+#board {
+    margin: 0 auto;
+    min-height: 200px;
+    text-align: left;
+    width: 650px;
+}

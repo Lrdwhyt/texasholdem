@@ -11,6 +11,7 @@ var calculateAction = function (cards, board, currentBet, committed, money) {
     let score = Hands.bestHand(possibleHand).score;
     let toCall = currentBet - committed;
     
+    // TODO: Improve decisionmaking
     if (toCall === 0) {
         if (score < 540000 && board.length === 5) {
             return new Bet(BetType.CHECK);
