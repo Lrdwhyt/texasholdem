@@ -237,7 +237,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
             case BetType.RAISE:
                 let toCallDifference = currentBet - bets[player.getName()];
-                if (player.getMoney() >= bet.amount && (bet.amount > toCallDifference + minRaise || bet.amount === player.getMoney())) {
+                if (player.getMoney() >= bet.amount && (bet.amount >= toCallDifference + minRaise || bet.amount === player.getMoney())) {
                     return true;
                 } else {
                     return false;
@@ -315,6 +315,9 @@ var Game = function (matchPlayers, button, matchCallback) {
                     lastPlayer = getPrevPlayer(player);
                 }
                 removeFromBetting(player);
+                if (player === lastPlayer) {
+                    lastPlayerFlag = true;
+                }
                 unfoldedPlayers.splice(unfoldedPlayers.indexOf(player), 1);
                 for (let pot of pots) { // Folded players not eligible for pots
                     pot.remove(player);
@@ -369,7 +372,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         if (currentPlayer !== player) {
             return; // Not player's turn to bet
         } else if (isValidBet(player, bet) === false) {
-            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
+            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()], minRaise));
             return; // Not a valid bet
         }
 
@@ -409,7 +412,7 @@ var Game = function (matchPlayers, button, matchCallback) {
             }
         }
         if (bettingStage !== BettingStage.COMPLETE) {
-            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
+            dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()], minRaise));
         }
     }
 
@@ -469,7 +472,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     bettingStage = BettingStage.PREFLOP;
 
-    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()]));
+    dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()], minRaise));
 
 }
 
@@ -491,11 +494,12 @@ var GameStartEvent = function (players) {
     this.players = players;
 };
 
-var BetAwaitEvent = function (player, callback, current, committed) {
+var BetAwaitEvent = function (player, callback, current, committed, minRaise) {
     this.player = player;
     this.callback = callback;
     this.current = current;
     this.committed = committed;
+    this.minRaise = minRaise;
 };
 
 var BetMadeEvent = function (player, bet) {

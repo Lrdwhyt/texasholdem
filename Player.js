@@ -252,6 +252,7 @@ var UserController = function (player, root) {
                     break;
 
                 case BetType.CALL:
+                    msg = e.player.getName() + " called"
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "CALLED";
                     break;
 
