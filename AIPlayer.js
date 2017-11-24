@@ -1,3 +1,9 @@
+var Strategy = {
+    NORMAL: 0,
+    TRICKY: 1,
+    AGGRESSIVE: 2
+}
+
 var calculateAction = function (cards, board, currentBet, committed, money) {
     let deck = new Deck();
     deck.shuffle();
@@ -7,10 +13,10 @@ var calculateAction = function (cards, board, currentBet, committed, money) {
     while (possibleHand.length < 7) {
         possibleHand.push(possibleDraws.pop());
     }
-    
+
     let score = Hands.bestHand(possibleHand).score;
     let toCall = currentBet - committed;
-    
+
     // TODO: Improve decisionmaking
     if (toCall === 0) {
         if (score < 540000 && board.length === 5) {

@@ -57,6 +57,7 @@ Card.prototype.getImage = function () {
     var img = document.createElement("img");
     img.src = "cards-svg/" + this.rank + this.suit + ".png";
     img.alt = this.toString();
+    img.className = "card";
     return img;
 };
 

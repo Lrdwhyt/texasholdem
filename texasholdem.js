@@ -305,6 +305,9 @@ var Game = function (matchPlayers, button, matchCallback) {
                 if (firstPlayer === player) {
                     firstPlayer = getPrevPlayer(player);
                 }
+                if (lastPlayer === player) {
+                    lastPlayer = getPrevPlayer(player);
+                }
                 removeFromBetting(player);
                 unfoldedPlayers.splice(unfoldedPlayers.indexOf(player), 1);
                 for (let pot of pots) { // Folded players not eligible for pots
@@ -440,7 +443,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     dispatchEvent(new GameStartEvent(players));
 
-    let ante = 20;
+    let ante = 25;
     var firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
     var currentPlayer = firstPlayer;
     var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises

@@ -95,26 +95,96 @@ var UserController = function (player, root) {
     });
 
     var resetUI = function () {
+        document.getElementById("user-info").innerHTML = "";
         document.getElementById("user-cards").innerHTML = "";
         document.getElementById("board").innerHTML = "";
-        document.getElementById("players").innerHTML = "";
+        document.getElementById("players-left").innerHTML = "";
+        document.getElementById("players-top").innerHTML = "";
+        document.getElementById("players-right").innerHTML = "";
     }
 
     var drawBoard = function (players) {
-        for (let player of players) {
-            var playerRoot = document.createElement("div");
-            playerRoot.setAttribute("name", player.getName());
-            playerRoot.className = "player";
-            var name = document.createElement("div");
-            name.className = "name";
-            name.textContent = player.getName();
-            var money = document.createElement("div");
-            money.className = "money";
-            money.textContent = player.getMoney();
-            playerRoot.appendChild(name);
-            playerRoot.appendChild(money);
-            document.getElementById("players").appendChild(playerRoot);
+        let otherPlayers = players.slice(0);
+        let index = otherPlayers.indexOf(player);
+        otherPlayers.splice(index, 1);
+        console.log(players.length);
+        document.getElementById("user-info").appendChild(drawPlayer(player));
+        switch (otherPlayers.length) {
+            case 1:
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[0]));
+                break;
+
+            case 2:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[1]));
+                break;
+
+            case 3:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[2]));
+                break;
+
+            case 4:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[2]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[3]));
+                break;
+
+            case 5:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[2]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[3]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[4]));
+                break;
+
+            case 6:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[2]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[3]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[4]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[5]));
+                break;
+
+            case 7:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[2]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[3]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[4]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[5]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[6]));
+                break;
+
+            case 8:
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[2]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[1]));
+                document.getElementById("players-left").appendChild(drawPlayer(otherPlayers[0]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[3]));
+                document.getElementById("players-top").appendChild(drawPlayer(otherPlayers[4]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[5]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[6]));
+                document.getElementById("players-right").appendChild(drawPlayer(otherPlayers[7]));
+                break;
         }
+    }
+
+    var drawPlayer = function(player) {
+        var playerRoot = document.createElement("div");
+        playerRoot.setAttribute("name", player.getName());
+        playerRoot.className = "player";
+        var name = document.createElement("div");
+        name.className = "name";
+        name.textContent = player.getName();
+        var money = document.createElement("div");
+        money.className = "money";
+        money.textContent = player.getMoney();
+        playerRoot.appendChild(name);
+        playerRoot.appendChild(money);
+        return playerRoot;
     }
 
     var updatePot = function (pots) {
@@ -210,6 +280,9 @@ var UserController = function (player, root) {
 
             if (e.result) {
                 Object.keys(e.result).forEach(function (key, i) {
+                    if (e.result[key].player === player.getName()) {
+                        return;
+                    }
                     var ele = document.querySelector("[name=" + e.result[key].player + "]");
                     for (var card of e.result[key].cards) {
                         ele.appendChild(card.getImage());
