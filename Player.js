@@ -101,6 +101,15 @@ var UserController = function (player, root) {
         document.getElementById("players-left").innerHTML = "";
         document.getElementById("players-top").innerHTML = "";
         document.getElementById("players-right").innerHTML = "";
+        document.querySelectorAll(".text").forEach(function(ele) {
+            ele.innerHTML = "he";
+        });
+    }
+
+    var resetBetting = function() {
+        document.querySelectorAll(".text").forEach(function (ele) {
+            ele.innerHTML = "";
+        });
     }
 
     var drawBoard = function (players) {
@@ -182,17 +191,26 @@ var UserController = function (player, root) {
         var money = document.createElement("div");
         money.className = "money";
         money.textContent = player.getMoney();
+        let text = document.createElement("div");
+        text.className = "text";
         playerRoot.appendChild(name);
         playerRoot.appendChild(money);
+        playerRoot.appendChild(text);
         return playerRoot;
     }
 
     var updatePot = function (pots) {
 
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
-
+            document.getElementById("pots").textContent = "Main pot: " + pots[0].size();
         } else {
-
+            for (let index in pots) {
+                if (index === "0") {
+                    document.getElementById("pots").textContent = "Main pot: " + pots[index].size();
+                } else if (pots[index].players.length > 1) {
+                    document.getElementById("pots").textContent += ", Side pot " + index + ": " + pots[index].size();
+                }
+            }
         }
     }
 
@@ -230,18 +248,22 @@ var UserController = function (player, root) {
             switch (e.bet.type) {
                 case BetType.RAISE:
                     msg = e.player.getName() + " raised to " + e.bet.amount;
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "BET " + e.bet.amount;
                     break;
 
                 case BetType.CALL:
-                    msg = e.player.getName() + " called";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "CALLED";
                     break;
 
                 case BetType.CHECK:
                     msg = e.player.getName() + " checked"
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "CHECKED";
                     break;
 
                 case BetType.FOLD:
                     msg = e.player.getName() + " folded";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "FOLDED";
+                    document.querySelector("[name=" + e.player.getName() + "]").className += " folded";
                     break;
 
                 default:
@@ -261,6 +283,7 @@ var UserController = function (player, root) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("Flop dealt")
+            resetBetting();
 
         } else if (e instanceof DealtTurnEvent) {
 
@@ -268,6 +291,7 @@ var UserController = function (player, root) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("Turn dealt")
+            resetBetting();
 
         } else if (e instanceof DealtRiverEvent) {
 
@@ -275,6 +299,7 @@ var UserController = function (player, root) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("River dealt")
+            resetBetting();
 
         } else if (e instanceof GameEndEvent) {
 

@@ -23,6 +23,10 @@ html, body {
     width: 70px;
 }
 
+.player.folded {
+    color: #ccc;
+}
+
 #user {
     bottom: 10px;
     position: absolute;
@@ -101,4 +105,10 @@ html, body {
     position: absolute;
     left: calc(50% - 325px);
     top: calc(50% - 97px);
+}
+
+#pots {
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }

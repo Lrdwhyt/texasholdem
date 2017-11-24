@@ -260,7 +260,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     var removeFromBetting = function (player) {
         if (player === lastPlayer) {
-            lastPlayer = getPrevPlayer(lastRaiser);
+            lastPlayer = getPrevPlayer(lastPlayer);
         }
         bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
         if (bettingPlayers.length === 1 && bets[bettingPlayers[0].getName()] === currentBet) {
@@ -279,6 +279,9 @@ var Game = function (matchPlayers, button, matchCallback) {
                     bets[player.getName()] += player.getMoney();
                     modMoney(player, -player.getMoney());
                     addBaseline(bets[player.getName()]);
+                    if (player === lastPlayer) {
+                        lastPlayerFlag = true;
+                    }
                     removeFromBetting(player);
                 }
                 break;
@@ -296,6 +299,9 @@ var Game = function (matchPlayers, button, matchCallback) {
                 bets[player.getName()] += bet.amount;
                 if (bet.amount === player.getMoney()) { // Player raises to all-in
                     addBaseline(bets[player.getName()]);
+                    if (player === lastPlayer) {
+                        lastPlayerFlag = true;
+                    }
                     removeFromBetting(player);
                 }
                 modMoney(player, -bet.amount);
@@ -378,7 +384,8 @@ var Game = function (matchPlayers, button, matchCallback) {
             return;
         }
 
-        if (player === lastPlayer) {
+        if (player === lastPlayer || lastPlayerFlag === true) {
+            lastPlayerFlag = false;
             switch (bettingStage) {
                 case BettingStage.PREFLOP:
                     dealFlop();
@@ -447,6 +454,7 @@ var Game = function (matchPlayers, button, matchCallback) {
     var firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
     var currentPlayer = firstPlayer;
     var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
+    let lastPlayerFlag = false;
     var lastRaiser = null;
     var currentBet = ante;
     let minRaise = ante * 2;
