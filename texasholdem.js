@@ -311,13 +311,10 @@ var Game = function (matchPlayers, button, matchCallback) {
                 if (firstPlayer === player) {
                     firstPlayer = getPrevPlayer(player);
                 }
-                if (lastPlayer === player) {
-                    lastPlayer = getPrevPlayer(player);
-                }
-                removeFromBetting(player);
                 if (player === lastPlayer) {
                     lastPlayerFlag = true;
                 }
+                removeFromBetting(player);
                 unfoldedPlayers.splice(unfoldedPlayers.indexOf(player), 1);
                 for (let pot of pots) { // Folded players not eligible for pots
                     pot.remove(player);
@@ -412,6 +409,9 @@ var Game = function (matchPlayers, button, matchCallback) {
             }
         }
         if (bettingStage !== BettingStage.COMPLETE) {
+            if (lastPlayer) {
+                console.log(lastPlayer.getName());
+            }
             dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()], minRaise));
         }
     }
