@@ -263,7 +263,10 @@ var Game = function (matchPlayers, button, matchCallback) {
             lastPlayer = getPrevPlayer(lastPlayer);
         }
         if (player === firstPlayer) {
-            firstPlayer = getNextPlayer(lastPlayer);
+            firstPlayer = getNextPlayer(firstPlayer);
+        }
+        if (player === currentPlayer) {
+            currentPlayer = getNextPlayer(currentPlayer);
         }
         bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
         if (bettingPlayers.length === 1 && bets[bettingPlayers[0].getName()] === currentBet) {
@@ -394,18 +397,21 @@ var Game = function (matchPlayers, button, matchCallback) {
                     dealFlop();
                     bettingStage = BettingStage.FLOP;
                     currentPlayer = firstPlayer;
+                    lastPlayer = getPrevPlayer(firstPlayer);
                     break;
 
                 case BettingStage.FLOP:
                     dealTurn();
                     bettingStage = BettingStage.TURN;
                     currentPlayer = firstPlayer;
+                    lastPlayer = getPrevPlayer(firstPlayer);
                     break;
 
                 case BettingStage.TURN:
                     dealRiver();
                     bettingStage = BettingStage.RIVER;
                     currentPlayer = firstPlayer;
+                    lastPlayer = getPrevPlayer(firstPlayer);
                     break;
 
                 case BettingStage.RIVER:

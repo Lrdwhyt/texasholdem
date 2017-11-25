@@ -6,40 +6,53 @@ var Strategy = {
 }
 
 var calculateAction = function (cards, board, currentBet, committed, minRaise, money) {
+
     let deck = new Deck();
-    deck.shuffle();
-    let possibleDraws = Hands.difference(deck.getCards(), cards.concat(board));
 
-    let totalScore = 0;
-    let totalType = 0;
+    let totalLosses = 0;
+    let totalWins = 0;
+    let totalDraws = 0;
+    let totalWinsOrDraws = 0;
 
-    for (let i = 0; i < 10; ++i) {
-        let possibleHand = cards.concat(board);
-        while (possibleHand.length < 7) {
-            possibleHand.push(possibleDraws.pop());
+    let trials = 20;
+
+    for (let i = 0; i < trials; ++i) {
+        deck.shuffle();
+        let possibleDraws = Hands.difference(deck.getCards(), cards.concat(board));
+        let possibleBoard = board;
+        while (possibleBoard.length < 5) {
+            possibleBoard.push(possibleDraws.pop());
         }
 
-        let bestHand = Hands.bestHand(possibleHand);
-        let score = bestHand.score;
-        let type = bestHand.type;
+        let possibleHand = cards.concat(possibleBoard);
 
-        totalScore += score;
-        totalType += type;
+        let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
+
+        let hypotheticalResult = Hands.bestHand(hypotheticalHand.concat(possibleBoard));
+        let bestHand = Hands.bestHand(possibleHand);
+
+        if (bestHand.score > hypotheticalResult.score) {
+            ++totalWins;
+        } else if (bestHand.score === hypotheticalResult.score) {
+            ++totalDraws;
+        } else {
+            ++totalLosses;
+        }
     }
 
-    let avgScore = totalScore / 10;
-    let avgType = totalType / 10;
+    let winRatio = totalWins / trials;
+    let lossRatio = totalLosses / trials;
 
     let toCall = currentBet - committed;
     let toRaise = currentBet - committed + minRaise;
 
     // TODO: Improve decisionmaking
     if (toCall === 0) {
-        if (avgType < 1.3) {
+        if (winRatio <= 0.5) {
             return new Bet(BetType.CHECK);
         } else {
             if (money > toRaise) {
-                let b = parseInt(toRaise * Math.sqrt(avgType));
+                let b = parseInt(toRaise * 3);
                 if (money > b) {
                     return new Bet(BetType.RAISE, b);
                 } else {
@@ -50,50 +63,48 @@ var calculateAction = function (cards, board, currentBet, committed, minRaise, m
             }
         }
     } else {
-        if (avgType < 1.2) {
-            let chance = currentBet / (committed + money);
-            chance += 0.3;
-            if (chance > 1) {
-                chance = 1;
+        if (winRatio <= 0.35) {
+            let chance = currentBet / (committed + money) + 0.3;
+            chance -= winRatio;
+            if (chance > 0.8) {
+                chance = 0.8;
             }
-            chance -= 0.4;
             if (Math.random() > chance) {
                 return new Bet(BetType.CALL);
             } else {
                 return new Bet(BetType.FOLD);
             }
-        } else if (avgType < 1.6) {
-            let chance = currentBet / (committed + money);
-            chance += 0.3;
-            if (chance > 1) {
-                chance = 1;
+        } else if (winRatio <= 0.6) {
+            let chance = currentBet / (committed + money) + 0.3;
+            chance -= winRatio;
+            if (chance > 0.7) {
+                chance = 0.7;
             }
-            chance -= 0.2;
             if (Math.random() > chance) {
                 return new Bet(BetType.CALL);
             } else {
                 return new Bet(BetType.FOLD);
             }
-        } else if (avgType < 2.4) {
-            let chance = currentBet / (committed + money);
-            if (chance > 1) {
-                chance = 1;
+        } else if (winRatio <= 0.8) {
+            let chance = currentBet / (committed + money) + 0.4;
+            chance -= winRatio;
+            if (chance > 0.6) {
+                chance = 0.6;
             }
-            chance /= 2;
             if (Math.random() > chance) {
                 return new Bet(BetType.CALL);
             } else {
                 return new Bet(BetType.FOLD);
             }
         } else {
-            let chance = currentBet / (committed + money);
-            chance += 0.4;
-            if (chance > 0.9) {
-                chance = 0.9;
+            let chance = currentBet / (committed + money) + 0.5;
+            chance -= winRatio;
+            if (chance > 0.5) {
+                chance = 0.5;
             }
             if (Math.random() > chance) {
                 if (money >= toRaise) {
-                    let b = parseInt(toRaise * avgType);
+                    let b = parseInt(toRaise * 5);
                     if (money >= b) {
                         return new Bet(BetType.RAISE, b);
                     } else {

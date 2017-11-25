@@ -56,6 +56,7 @@ var UserController = function (player, root) {
 
     console.log("Game started");
     root.querySelector("#actions").addEventListener("click", function (e) {
+        disableBetting();
         switch (e.target.id) {
             case "raise":
                 var amount = parseInt(document.getElementById("bet").value);
@@ -116,7 +117,6 @@ var UserController = function (player, root) {
         let otherPlayers = players.slice(0);
         let index = otherPlayers.indexOf(player);
         otherPlayers.splice(index, 1);
-        console.log(players.length);
         document.getElementById("user-info").appendChild(drawPlayer(player));
         switch (otherPlayers.length) {
             case 1:
@@ -215,6 +215,9 @@ var UserController = function (player, root) {
     }
 
     var restrictToValid = function (current, committed, minRaise, money) {
+        document.getElementById("all-in").disabled = false;
+        document.getElementById("fold").disabled = false;
+
         if (current - committed > 0) {
             document.getElementById("call").disabled = false;
             document.getElementById("check").disabled = true;
@@ -234,6 +237,14 @@ var UserController = function (player, root) {
         } else {
             document.getElementById("raise").disabled = false;
         }
+    }
+
+    var disableBetting = function() {
+        document.getElementById("raise").disabled = true;
+        document.getElementById("call").disabled = true;
+        document.getElementById("all-in").disabled = true;
+        document.getElementById("check").disabled = true;
+        document.getElementById("fold").disabled = true;
     }
 
     //Allows game to notify player of events
