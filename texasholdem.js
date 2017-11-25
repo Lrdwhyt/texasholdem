@@ -228,7 +228,7 @@ var Game = function (matchPlayers, button, matchCallback) {
     var isValidBet = function (player, bet) {
         switch (bet.type) {
             case BetType.CALL:
-                if (currentBet - bets[player.getName()] > 0) {
+                if (currentBet - bets[player.getName()] > 0 && player.getMoney() > 0) {
                     return true;
                 } else {
                     return false;
@@ -309,7 +309,7 @@ var Game = function (matchPlayers, button, matchCallback) {
 
             case BetType.FOLD:
                 if (firstPlayer === player) {
-                    firstPlayer = getPrevPlayer(player);
+                    firstPlayer = getNextPlayer(player);
                 }
                 if (player === lastPlayer) {
                     lastPlayerFlag = true;

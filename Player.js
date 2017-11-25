@@ -101,12 +101,12 @@ var UserController = function (player, root) {
         document.getElementById("players-left").innerHTML = "";
         document.getElementById("players-top").innerHTML = "";
         document.getElementById("players-right").innerHTML = "";
-        document.querySelectorAll(".text").forEach(function(ele) {
+        document.querySelectorAll(".text").forEach(function (ele) {
             ele.innerHTML = "he";
         });
     }
 
-    var resetBetting = function() {
+    var resetBetting = function () {
         document.querySelectorAll(".text").forEach(function (ele) {
             ele.innerHTML = "";
         });
@@ -181,7 +181,7 @@ var UserController = function (player, root) {
         }
     }
 
-    var drawPlayer = function(player) {
+    var drawPlayer = function (player) {
         var playerRoot = document.createElement("div");
         playerRoot.setAttribute("name", player.getName());
         playerRoot.className = "player";
@@ -214,6 +214,28 @@ var UserController = function (player, root) {
         }
     }
 
+    var restrictToValid = function (current, committed, minRaise, money) {
+        if (current - committed > 0) {
+            document.getElementById("call").disabled = false;
+            document.getElementById("check").disabled = true;
+            if (money >= current - committed) {
+                document.getElementById("call").textContent = "Call (-" + (current - committed) + ")";
+            } else {
+                document.getElementById("call").textContent = "Call (-" + money + ")";
+            }
+        } else {
+            document.getElementById("call").disabled = true;
+            document.getElementById("check").disabled = false;
+            document.getElementById("call").textContent = "Call";
+        }
+
+        if (minRaise + current - committed > money) {
+            document.getElementById("raise").disabled = true;
+        } else {
+            document.getElementById("raise").disabled = false;
+        }
+    }
+
     //Allows game to notify player of events
     var dispatchEvent = function (e) {
 
@@ -239,6 +261,7 @@ var UserController = function (player, root) {
                 console.log("Your turn!");
                 callbackFunction = e.callback;
                 toCall = e.current - e.committed;
+                restrictToValid(e.current, e.committed, e.minRaise, player.getMoney());
             }
 
         } else if (e instanceof BetMadeEvent) {
