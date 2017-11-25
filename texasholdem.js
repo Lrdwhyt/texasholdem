@@ -390,16 +390,19 @@ var Game = function (matchPlayers, button, matchCallback) {
                 case BettingStage.PREFLOP:
                     dealFlop();
                     bettingStage = BettingStage.FLOP;
+                    currentPlayer = firstPlayer;
                     break;
 
                 case BettingStage.FLOP:
                     dealTurn();
                     bettingStage = BettingStage.TURN;
+                    currentPlayer = firstPlayer;
                     break;
 
                 case BettingStage.TURN:
                     dealRiver();
                     bettingStage = BettingStage.RIVER;
+                    currentPlayer = firstPlayer;
                     break;
 
                 case BettingStage.RIVER:
@@ -409,9 +412,6 @@ var Game = function (matchPlayers, button, matchCallback) {
             }
         }
         if (bettingStage !== BettingStage.COMPLETE) {
-            if (lastPlayer) {
-                console.log(lastPlayer.getName());
-            }
             dispatchEvent(new BetAwaitEvent(currentPlayer, makeBet, currentBet, bets[currentPlayer.getName()], minRaise));
         }
     }
