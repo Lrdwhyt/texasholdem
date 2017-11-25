@@ -262,6 +262,9 @@ var Game = function (matchPlayers, button, matchCallback) {
         if (player === lastPlayer) {
             lastPlayer = getPrevPlayer(lastPlayer);
         }
+        if (player === firstPlayer) {
+            firstPlayer = getNextPlayer(lastPlayer);
+        }
         bettingPlayers.splice(bettingPlayers.indexOf(player), 1);
         if (bettingPlayers.length === 1 && bets[bettingPlayers[0].getName()] === currentBet) {
             bettingPlayers.pop();
