@@ -3,28 +3,61 @@ html, body {
 }
 
 #container {
-    height: 100%;
+    min-width: 1080px;
 }
 
-.name {
-    font-weight: bold;
+#match-controls {
+    position: fixed;
+    z-index: 3;
+}
+
+#match-controls button {
+    height: 2em;
+}
+
+#players {
+    display: flex;
+    flex-direction: row;
+}
+
+#players-left, #players-right {
+    align-items: center;
+    display: inline-flex;
+    flex: 1 1 25%;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+#players-top {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 50%;
+    text-align: center;
+}
+
+#players-top .player {
+    flex: 1 1;
 }
 
 .player {
-    display: inline-block;
-    margin: 10px 0;
-    height: 30%;
-    min-height: 200px;
-    min-width: 150px;
-    vertical-align: top;
+    flex: 0 0 30%;
+    min-height: 180px;
+    min-width: 160px;
 }
 
 .player .card {
     width: 70px;
+    margin: 0 1px;
 }
 
 .player.folded {
     color: #ccc;
+}
+
+.name {
+    font-weight: bold;
 }
 
 #user {
@@ -41,55 +74,23 @@ html, body {
     vertical-align: bottom;
 }
 
+#user .player {
+    min-height: initial;
+    min-width: initial;
+}
+
 #user-cards {
     display: inline-block;
     width: 270px;
     vertical-align: bottom;
 }
 
+#user-cards .card {
+    margin: 0 3px;
+}
+
 #user button {
     height: 2em;
-}
-
-#players-left, #players-right {
-    position: absolute;
-}
-
-#players-left {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-    text-align: center;
-    width: 19%;
-}
-
-#players-left .player {
-    width: 100%;
-}
-
-#players-top {
-    vertical-align: top;
-    display: inline-block;
-    margin-left: 20%;
-    width: 60%;
-    text-align: center;
-}
-
-#players-top .player {
-    margin: 0 10%;
-}
-
-#players-right {
-    vertical-align: middle;
-    display: inline-block;
-    height: 100%;
-    text-align: center;
-    width: 19%;
-    right: 0;
-}
-
-#players-right .player {
-    width: 100%;
 }
 
 #board .card {
@@ -108,7 +109,7 @@ html, body {
 }
 
 #pots {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
 }
