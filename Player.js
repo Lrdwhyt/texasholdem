@@ -54,7 +54,6 @@ var UserController = function (player, root) {
     var root;
     let toCall = 0;
 
-    console.log("Game started");
     root.querySelector("#actions").addEventListener("click", function (e) {
         disableBetting();
         switch (e.target.id) {
@@ -251,7 +250,7 @@ var UserController = function (player, root) {
     var dispatchEvent = function (e) {
 
         if (e instanceof GameStartEvent) {
-
+            console.log("Game started");
             resetUI();
             drawBoard(e.players);
 
