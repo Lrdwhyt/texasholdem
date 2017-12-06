@@ -1,18 +1,18 @@
-var BetType = {
-    FOLD: 0,
-    CHECK: 1,
-    CALL: 2,
-    RAISE: 3,
-    ALL_IN: 4
+enum BetType {
+    FOLD,
+    CHECK,
+    CALL,
+    RAISE,
+    ALL_IN
 };
 
-var BettingStage = {
-    NONE: 0,
-    PREFLOP: 1,
-    FLOP: 2,
-    TURN: 3,
-    RIVER: 4,
-    COMPLETE: 5
+enum BettingStage {
+    NONE,
+    PREFLOP,
+    FLOP,
+    TURN,
+    RIVER,
+    COMPLETE
 };
 
 let OfflineMatch = function () {
