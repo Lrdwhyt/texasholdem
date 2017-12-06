@@ -15,11 +15,11 @@ var BettingStage = {
     COMPLETE: 5
 };
 
-var OfflineMatch = function () {
+let OfflineMatch = function () {
 
-    var players = [];
-    var game;
-    var buttonPosition = 0;
+    let players = [];
+    let game;
+    let buttonPosition: number = 0;
 
     var addPlayer = function (player) {
         players.push(player);
@@ -87,8 +87,8 @@ Pot.prototype.add = function (player, amount) {
     this.bets[player.getName()] = parseInt(amount);
 }
 
-Pot.prototype.size = function () {
-    let size = 0;
+Pot.prototype.size = function (): number {
+    let size: number = 0;
     let obj = this.bets;
     Object.keys(this.bets).forEach(function (key, index, b) {
         size += obj[key];
@@ -115,8 +115,8 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
 
     var getEligiblePot = function (player, amount) {
-        let totalBet = bets[player.getName()] + amount;
-        let pot = totalBet;
+        let totalBet: number = bets[player.getName()] + amount;
+        let pot: number = totalBet;
         for (let p in bets) {
             if (p !== player.getName()) {
                 if (totalBet > bets[p]) {
@@ -130,13 +130,13 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
 
     var processPot = function (pot) {
-        var results = {};
-        var winners = [];
-        var bestScore = 0;
-        var bestHand;
+        let results = {};
+        let winners = [];
+        let bestScore: number = 0;
+        let bestHand;
         for (let player of pot.players) {
-            var playerHand = Hands.bestHand(player.getHand().concat(flop).concat(turn).concat(river));
-            var playerScore = playerHand.score;
+            let playerHand = Hands.bestHand(player.getHand().concat(flop).concat(turn).concat(river));
+            let playerScore: number = playerHand.score;
             results[player.getName()] = {
                 player: player.getName(),
                 cards: player.getHand(),
@@ -482,14 +482,14 @@ var Game = function (matchPlayers, button, matchCallback) {
 
     dispatchEvent(new GameStartEvent(players));
 
-    let ante = 25;
-    var firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
-    var currentPlayer = firstPlayer;
-    var lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
-    let lastPlayerFlag = false;
-    var lastRaiser = null;
-    var currentBet = ante;
-    let minRaise = ante * 2;
+    let ante: number = 25;
+    let firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
+    let currentPlayer = firstPlayer;
+    let lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
+    let lastPlayerFlag: boolean = false;
+    let lastRaiser = null;
+    let currentBet: number = ante;
+    let minRaise: number = ante * 2;
 
     deductAntes(ante);
 
