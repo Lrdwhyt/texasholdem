@@ -10,7 +10,7 @@ enum BettingStage {
 class OfflineMatch {
 
     private players: Player[];
-    private game;
+    private game: OfflineGame;
     private buttonPosition: number;
 
     constructor() {
@@ -49,9 +49,9 @@ class OfflineMatch {
 }
 
 class MatchController {
-    match;
+    match: OfflineMatch;
 
-    constructor(match) {
+    constructor(match: OfflineMatch) {
         this.match = match;
         document.getElementById("match-controls").addEventListener("click", (e) => {
             if ((<HTMLElement>e.target).id === "next-game") {
@@ -71,7 +71,7 @@ class OfflineGame {
     private turn: Card[];
     private river: Card[];
 
-    private bets;
+    private bets: { [name: string]: number };
     private baselines: number[];
     private pots: Pot[];
 
@@ -87,9 +87,9 @@ class OfflineGame {
 
     private bettingStage: BettingStage;
     private button: number;
-    private match;
+    private match: OfflineMatch;
 
-    constructor(players: Player[], button: number, match) {
+    constructor(players: Player[], button: number, match: OfflineMatch) {
         this.match = match;
 
         this.players = players.slice(0);
@@ -125,7 +125,7 @@ class OfflineGame {
         this.init();
     }
 
-    init() {
+    init(): void {
         for (let player of this.players) {
             this.bets[player.getName()] = 0;
             player.resetHand();
@@ -190,7 +190,7 @@ class OfflineGame {
     }
 
     getPrevPlayer(player: Player): Player {
-        var i = this.bettingPlayers.indexOf(player);
+        let i = this.bettingPlayers.indexOf(player);
         if (i === 0) {
             return this.bettingPlayers[this.bettingPlayers.length - 1];
         } else {
@@ -210,11 +210,10 @@ class OfflineGame {
                 }
             }
         }
-        console.log(pot);
         return pot;
     }
 
-    addBaseline(baseline: number) {
+    addBaseline(baseline: number): void {
         if (this.baselines.indexOf(baseline) >= 0) { // Already registered as a baseline
             return;
         }
@@ -236,11 +235,11 @@ class OfflineGame {
         this.updatePots(); // Redistribute pots
     }
 
-    processPot(pot) {
+    processPot(pot): any {
         let results = {};
-        let winners = [];
+        let winners: Player[] = [];
         let bestScore: number = 0;
-        let bestHand;
+        let bestHand: Card[];
         for (let player of pot.players) {
             let playerHand = Hands.bestHand(player.getHand().concat(this.flop).concat(this.turn).concat(this.river));
             let playerScore: number = playerHand.score;
@@ -261,14 +260,14 @@ class OfflineGame {
         if (winners.length === 1) {
             this.modMoney(winners[0], pot.size());
         } else { // Split pot
-            for (var player of winners) {
+            for (let player of winners) {
                 this.modMoney(player, Math.floor(pot.size() / winners.length));
             }
         }
         return results;
     }
 
-    updatePots() { // Distribute players and their bets according to pot baselines
+    updatePots(): void { // Distribute players and their bets according to pot baselines
         for (let player of this.players) {
             if (this.pots.length === 1) { // No side pots
                 this.pots[0].add(player, this.bets[player.getName()]);
@@ -293,7 +292,7 @@ class OfflineGame {
         this.dispatchEvent(new PotChangeEvent(this.pots));
     }
 
-    isValidBet(player: Player, bet: Bet) {
+    isValidBet(player: Player, bet: Bet): boolean {
         switch (bet.type) {
             case BetType.CALL:
                 if (this.currentBet - this.bets[player.getName()] > 0 && player.getMoney() > 0) {
@@ -303,8 +302,8 @@ class OfflineGame {
                 }
 
             case BetType.RAISE:
-                let toCallDifference = this.currentBet - this.bets[player.getName()];
-                if (player.getMoney() >= bet.amount && (bet.amount >= toCallDifference + this.minRaise || bet.amount === player.getMoney())) {
+                let amountToCall: number = this.currentBet - this.bets[player.getName()];
+                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + this.minRaise || bet.amount === player.getMoney())) {
                     return true;
                 } else {
                     return false;
@@ -325,7 +324,7 @@ class OfflineGame {
         }
     }
 
-    removeFromBetting(player: Player) {
+    removeFromBetting(player: Player): void {
         if (player === this.lastPlayer) {
             this.lastPlayer = this.getPrevPlayer(this.lastPlayer);
         }
@@ -341,7 +340,7 @@ class OfflineGame {
         }
     }
 
-    processBet(player: Player, bet: Bet) {
+    processBet(player: Player, bet: Bet): void {
         switch (bet.type) {
             case BetType.CALL:
                 let toCallDifference = this.currentBet - this.bets[player.getName()];
@@ -396,7 +395,7 @@ class OfflineGame {
         }
     }
 
-    dealFlop() {
+    dealFlop(): void {
         this.deck.pop();
         this.flop.push(this.deck.deal());
         this.flop.push(this.deck.deal());
@@ -404,21 +403,31 @@ class OfflineGame {
         this.dispatchEvent(new DealtFlopEvent(this.flop));
     };
 
-    dealTurn() {
+    dealTurn(): void {
         this.deck.pop();
         this.turn.push(this.deck.deal());
         this.dispatchEvent(new DealtTurnEvent(this.turn));
     }
 
-    dealRiver() {
+    dealRiver(): void {
         this.deck.pop();
         this.river.push(this.deck.deal());
         this.dispatchEvent(new DealtRiverEvent(this.river));
     }
 
-    finish() { }
+    finish(): void {
+        let result = null;
+        for (let index in this.pots) {
+            if (index === "0") {
+                result = this.processPot(this.pots[index]);
+            } else {
+                this.processPot(this.pots[index]);
+            }
+        }
+        this.dispatchEvent(new GameEndEvent(result));
+    }
 
-    finishToEnd() {
+    finishToEnd(): void {
         if (this.bettingStage !== BettingStage.RIVER) {
             switch (this.bettingStage) {
                 case BettingStage.PREFLOP:
@@ -440,7 +449,7 @@ class OfflineGame {
         this.dispatchEvent(new GameEndEvent(result));
     }
 
-    makeBet = (player, bet) => {
+    makeBet = (player: Player, bet: Bet): void => {
         if (this.currentPlayer !== player) {
             return; // Not player's turn to bet
         } else if (this.isValidBet(player, bet) === false) {
@@ -453,8 +462,11 @@ class OfflineGame {
         this.updatePots();
         this.dispatchEvent(new BetMadeEvent(player, bet));
 
-        if (this.bettingPlayers.length === 0 || this.unfoldedPlayers.length === 1 || this.bettingPlayers.length === 1 && this.currentBet === this.bets[this.bettingPlayers[0].getName()]) {
-            //Only one player left
+        if (this.unfoldedPlayers.length === 1) { // Last player wins by default
+            this.finish();
+            return;
+        } else if (this.bettingPlayers.length === 0 || this.bettingPlayers.length === 1 && this.currentBet === this.bets[this.bettingPlayers[0].getName()]) {
+            // Only one player or no players left betting, so no need to continue betting
             this.finishToEnd();
             return;
         }
