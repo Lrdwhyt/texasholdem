@@ -30,21 +30,21 @@ class Player {
         this.money += amount;
     }
 
-    setController(newController) {
+    setController(newController: Controller) {
         this.controller = newController;
     }
 
-    getController() {
+    getController(): Controller {
         return this.controller;
     }
 
-    deal(card: Card) {
+    deal(card: Card): void {
         this.hand.push(card);
     }
 }
 
 interface Controller {
-    dispatchEvent(e: any): void;
+    dispatchEvent(e: GameEvent): void;
 }
 
 class UserController implements Controller {
@@ -69,7 +69,7 @@ class UserController implements Controller {
         }
     }
 
-    dispatchEvent(e): void {
+    dispatchEvent(e: GameEvent): void {
 
         if (e instanceof GameStartEvent) {
             console.log("Game started");
@@ -81,7 +81,7 @@ class UserController implements Controller {
             this.view.drawBoard(otherPlayers);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
-            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = e.player.getMoney();
+            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = e.player.getMoney().toString();
             console.log(e.player.getName() + " money changed: " + e.change);
 
         } else if (e instanceof DealtHandEvent) {
@@ -92,7 +92,6 @@ class UserController implements Controller {
 
         } else if (e instanceof BetAwaitEvent) {
 
-            //TODO: Fade out/disable invalid bet options
             if (e.player === this.player) {
                 console.log("Your turn!");
                 this.callbackFunction = e.callback;

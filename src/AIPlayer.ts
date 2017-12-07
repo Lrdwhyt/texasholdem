@@ -435,7 +435,7 @@ class AIController implements Controller {
     }
 
     //Allows game to notify player of events
-    dispatchEvent(e): void {
+    dispatchEvent(e: GameEvent): void {
         if (e instanceof GameStartEvent) {
             this.board = [];
         } else if (e instanceof DealtHandEvent) {

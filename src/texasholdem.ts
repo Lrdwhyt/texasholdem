@@ -30,7 +30,7 @@ class OfflineMatch {
         this.players.push(player);
     }
 
-    dispatchEvent(e): void {
+    dispatchEvent(e: GameEvent): void {
         if (e instanceof DealtHandEvent) {
             e.player.getController().dispatchEvent(e);
             return;
@@ -56,13 +56,17 @@ class OfflineMatch {
 
 }
 
-var MatchController = function (match) {
-    var match;
-    document.getElementById("match-controls").addEventListener("click", function (e) {
-        if ((<HTMLElement>e.target).id === "next-game") {
-            match.startGame();
-        }
-    });
+class MatchController {
+    match;
+
+    constructor(match) {
+        this.match = match;
+        document.getElementById("match-controls").addEventListener("click", (e) => {
+            if ((<HTMLElement>e.target).id === "next-game") {
+                match.startGame();
+            }
+        });
+    }
 }
 
 class Bet {
@@ -113,7 +117,7 @@ class Pot {
 
 var Game = function (matchPlayers, button, matchCallback) {
 
-    var dispatchEvent = function (e) {
+    var dispatchEvent = function (e: GameEvent) {
         parentMatch.dispatchEvent(e);
     }
 
@@ -512,17 +516,29 @@ var Game = function (matchPlayers, button, matchCallback) {
 
 }
 
-var DealtHandEvent = function (player, hand) {
-    this.player = player;
-    this.hand = hand;
+interface GameEvent { }
+
+class DealtHandEvent implements GameEvent {
+    public player: Player;
+    public hand: Card[];
+
+    constructor(player: Player, hand: Card[]) {
+        this.player = player;
+        this.hand = hand;
+    }
 }
 
-var PlayerMoneyChangeEvent = function (player, change) {
-    this.player = player;
-    this.change = change;
-};
+class PlayerMoneyChangeEvent implements GameEvent {
+    public player: Player;
+    public change: number;
 
-class PotChangeEvent {
+    constructor(player, change) {
+        this.player = player;
+        this.change = change;
+    }
+}
+
+class PotChangeEvent implements GameEvent {
     public pots;
 
     constructor(pots) {
@@ -530,36 +546,70 @@ class PotChangeEvent {
     }
 }
 
-var GameStartEvent = function (players) {
-    this.players = players;
-};
+class GameStartEvent implements GameEvent {
+    public players: Player[];
 
-var BetAwaitEvent = function (player, callback, current, committed, minRaise, potCheck) {
-    this.player = player;
-    this.callback = callback;
-    this.current = current;
-    this.committed = committed;
-    this.minRaise = minRaise;
-    this.potCheck = potCheck;
-};
+    constructor(players: Player[]) {
+        this.players = players;
+    }
+}
 
-var BetMadeEvent = function (player, bet) {
-    this.player = player;
-    this.bet = bet;
-};
+class BetAwaitEvent implements GameEvent {
+    public player: Player;
+    public callback;
+    public current: number;
+    public committed: number;
+    public minRaise: number;
+    public potCheck;
 
-var DealtFlopEvent = function (cards) {
-    this.cards = cards;
-};
+    constructor(player: Player, callback, current: number, committed: number, minRaise: number, potCheck) {
+        this.player = player;
+        this.callback = callback;
+        this.current = current;
+        this.committed = committed;
+        this.minRaise = minRaise;
+        this.potCheck = potCheck;
+    }
+}
 
-var DealtTurnEvent = function (cards) {
-    this.cards = cards;
-};
+class BetMadeEvent implements GameEvent {
+    public player: Player;
+    public bet: Bet;
 
-var DealtRiverEvent = function (cards) {
-    this.cards = cards;
-};
+    constructor(player: Player, bet: Bet) {
+        this.player = player;
+        this.bet = bet;
+    }
+}
 
-var GameEndEvent = function (result) {
-    this.result = result;
-};
+class DealtFlopEvent implements GameEvent {
+    public cards: Card[];
+
+    constructor(cards: Card[]) {
+        this.cards = cards;
+    }
+}
+
+class DealtTurnEvent implements GameEvent {
+    public cards: Card[];
+
+    constructor(cards: Card[]) {
+        this.cards = cards;
+    }
+}
+
+class DealtRiverEvent implements GameEvent {
+    public cards: Card[];
+
+    constructor(cards: Card[]) {
+        this.cards = cards;
+    }
+}
+
+class GameEndEvent implements GameEvent {
+    public result;
+
+    constructor(result) {
+        this.result = result;
+    }
+}
