@@ -75,33 +75,40 @@ class Bet {
     }
 }
 
-var Pot = function () {
-    this.baseline = 0;
-    this.bets = {};
-    this.players = [];
-}
+class Pot {
+    baseline: number;
+    bets;
+    players: Player[];
 
-Pot.prototype.add = function (player, amount) {
-    if (this.players.indexOf(player) === -1) {
-        this.players.push(player);
+    constructor() {
+        this.players = [];
+        this.bets = {};
+        this.baseline = 0;
     }
-    this.bets[player.getName()] = parseInt(amount);
-}
 
-Pot.prototype.size = function (): number {
-    let size: number = 0;
-    let obj = this.bets;
-    Object.keys(this.bets).forEach(function (key, index, b) {
-        size += obj[key];
-    });
-    return size;
-}
-
-Pot.prototype.remove = function (player) {
-    let index = this.players.indexOf(player);
-    if (index >= 0) {
-        this.players.splice(index, 1);
+    add(player, amount) {
+        if (this.players.indexOf(player) === -1) {
+            this.players.push(player);
+        }
+        this.bets[player.getName()] = parseInt(amount);
     }
+
+    size(): number {
+        let size: number = 0;
+        let obj = this.bets;
+        Object.keys(this.bets).forEach(function (key, index, b) {
+            size += obj[key];
+        });
+        return size;
+    }
+
+    remove(player) {
+        let index = this.players.indexOf(player);
+        if (index >= 0) {
+            this.players.splice(index, 1);
+        }
+    }
+
 }
 
 var Game = function (matchPlayers, button, matchCallback) {
