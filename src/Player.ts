@@ -48,7 +48,7 @@ interface Controller {
 }
 
 class UserController implements Controller {
-    callbackFunction;
+    callbackFunction: (player: Player, bet: Bet) => void;
     player: Player;
     root: HTMLElement;
     amountToCall: number;
@@ -61,6 +61,13 @@ class UserController implements Controller {
     }
 
     placeBet(bet: Bet) {
+        if (bet.type === BetType.ALL_IN) {
+            if (this.player.getMoney() <= this.amountToCall) {
+                bet = new Bet(BetType.CALL);
+            } else {
+                bet = new Bet(BetType.RAISE, this.player.getMoney());
+            }
+        }
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.minRaise)) {
             this.view.disableBetting();
             this.callbackFunction(this.player, bet);
@@ -169,12 +176,14 @@ class UserController implements Controller {
                         return;
                     }
                     let ele = document.querySelector("[name=" + e.result[key].player + "]");
-                    for (let card of e.result[key].cards) {
-                        ele.appendChild(card.getImage());
+                    if (e.result[key].showdown === true) {
+                        for (let card of e.result[key].cards) {
+                            ele.appendChild(card.getImage());
+                        }
+                        let score = document.createElement("div");
+                        score.textContent = e.result[key].score;
+                        ele.appendChild(score);
                     }
-                    let score = document.createElement("div");
-                    score.textContent = e.result[key].score;
-                    ele.appendChild(score);
                 });
             }
         }
@@ -230,15 +239,17 @@ class UserView {
         document.getElementById("players-left").innerHTML = "";
         document.getElementById("players-top").innerHTML = "";
         document.getElementById("players-right").innerHTML = "";
-        document.querySelectorAll(".text").forEach(function (ele) {
-            ele.innerHTML = "he";
-        });
+        let texts = document.querySelectorAll(".text")
+        for (let i = 0; i < texts.length; ++i) {
+            texts[i].innerHTML = "he";
+        };
     }
 
     resetBetting() {
-        document.querySelectorAll(".text").forEach(function (ele) {
-            ele.innerHTML = "";
-        });
+        let texts = document.querySelectorAll(".text")
+        for (let i = 0; i < texts.length; ++i) {
+            texts[i].innerHTML = "";
+        };
     }
 
     drawPlayer(player: Player) {

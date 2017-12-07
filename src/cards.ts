@@ -271,7 +271,7 @@ var Hands = (function () {
     }
 
     var bestHand = function (cards) {
-        let hand = [];
+        let hand: Card[] = [];
         let score: number;
 
         let mostCommonSuits = groupBySuit(cards);

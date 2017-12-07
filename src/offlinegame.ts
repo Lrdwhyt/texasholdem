@@ -236,6 +236,13 @@ class OfflineGame {
     }
 
     processPot(pot): any {
+        if (pot.players.length === 1) {
+            this.modMoney(pot.players[0], pot.size());
+            return {
+                player: pot.players[0],
+                showdown: false
+            };
+        }
         let results = {};
         let winners: Player[] = [];
         let bestScore: number = 0;
@@ -247,7 +254,8 @@ class OfflineGame {
                 player: player.getName(),
                 cards: player.getHand(),
                 hand: playerHand.hand,
-                score: playerScore
+                score: playerScore,
+                showdown: true
             };
             if (playerScore > bestScore) {
                 bestScore = playerScore;
