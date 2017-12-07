@@ -452,7 +452,9 @@ class OfflineGame {
     makeBet = (player: Player, bet: Bet): void => {
         if (this.currentPlayer !== player) {
             return; // Not player's turn to bet
-        } else if (this.isValidBet(player, bet) === false) {
+        }
+        let amountToCall: number = this.currentBet - this.bets[player.getName()];
+        if (Betting.isValidBet(player, bet, amountToCall, this.minRaise) === false) {
             this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.minRaise, this.getEligiblePot));
             return; // Not a valid bet
         }

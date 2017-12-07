@@ -49,5 +49,37 @@ class Pot {
             this.players.splice(index, 1);
         }
     }
+}
 
+class Betting {
+    static isValidBet(player: Player, bet: Bet, amountToCall: number, minRaise: number): boolean {
+        switch (bet.type) {
+            case BetType.CALL:
+                if (amountToCall > 0 && player.getMoney() > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            case BetType.RAISE:
+                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || bet.amount === player.getMoney())) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            case BetType.CHECK:
+                if (amountToCall === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            case BetType.FOLD:
+                return true;
+
+            default:
+                return false;
+        }
+    }
 }

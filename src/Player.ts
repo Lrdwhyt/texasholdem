@@ -51,7 +51,8 @@ class UserController implements Controller {
     callbackFunction;
     player: Player;
     root: HTMLElement;
-    toCall: number;
+    amountToCall: number;
+    minRaise: number;
     view: UserView;
 
     constructor(player: Player, root: HTMLElement) {
@@ -60,8 +61,7 @@ class UserController implements Controller {
     }
 
     placeBet(bet: Bet) {
-        //if (isValidBet(this.player, bet)) {
-        if (true) {
+        if (Betting.isValidBet(this.player, bet, this.amountToCall, this.minRaise)) {
             this.view.disableBetting();
             this.callbackFunction(this.player, bet);
         } else {
@@ -95,7 +95,8 @@ class UserController implements Controller {
             if (e.player === this.player) {
                 console.log("Your turn!");
                 this.callbackFunction = e.callback;
-                this.toCall = e.current - e.committed;
+                this.amountToCall = e.current - e.committed;
+                this.minRaise = e.minRaise;
                 this.view.restrictToValid(e.current, e.committed, e.minRaise, this.player.getMoney());
             }
 
