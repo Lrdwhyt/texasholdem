@@ -1,7 +1,7 @@
 class Player {
     private name: string;
     private money: number;
-    private hand;
+    private hand: Card[];
     private controller;
 
     constructor(name: string, money: number) {
@@ -10,15 +10,15 @@ class Player {
         this.hand = [];
     }
 
-    getName() {
+    getName(): string {
         return this.name;
     }
 
-    getHand() {
+    getHand(): Card[] {
         return this.hand;
     }
 
-    resetHand() {
+    resetHand(): void {
         this.hand = [];
     }
 
@@ -26,7 +26,7 @@ class Player {
         return this.money;
     }
 
-    modMoney(amount: number) {
+    modMoney(amount: number): void {
         this.money += amount;
     }
 
@@ -38,14 +38,14 @@ class Player {
         return this.controller;
     }
 
-    deal(card) {
+    deal(card: Card) {
         this.hand.push(card);
     }
 }
 
-var UserController = function (player, root) {
+var UserController = function (player: Player, root) {
     let callbackFunction;
-    var player;
+    var player: Player;
     var root;
     let toCall = 0;
 

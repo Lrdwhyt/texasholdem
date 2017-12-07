@@ -10,44 +10,45 @@ enum HandCombinations {
     STRAIGHT_FLUSH
 }
 
-var Deck = function () {
-    let cards = [];
-    for (let suit of ["S", "H", "D", "C"]) {
-        for (let rank of [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]) {
-            cards.push(new Card(rank, suit));
+class Deck {
+    private cards: Card[];
+
+    constructor() {
+        this.cards = [];
+        for (let suit of ["S", "H", "D", "C"]) {
+            for (let rank of [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]) {
+                this.cards.push(new Card(rank, suit));
+            }
         }
     }
 
-    this.shuffle = function () {
-        for (let i = cards.length - 1; i > 0; --i) {
+    shuffle(): void {
+        for (let i = this.cards.length - 1; i > 0; --i) {
             let j = Math.floor(Math.random() * (i + 1));
-            let ele = cards[i];
-            cards[i] = cards[j];
-            cards[j] = ele;
+            let ele = this.cards[i];
+            this.cards[i] = this.cards[j];
+            this.cards[j] = ele;
         }
     };
 
-    this.deal = function () {
-        return cards.pop();
+    deal(): Card {
+        return this.cards.pop();
     };
 
-    this.pop = function () {
-        cards.pop();
+    pop(): void {
+        this.cards.pop();
     };
 
-    this.getCards = function() {
-        return cards;
+    getCards(): Card[] {
+        return this.cards;
     };
-};
 
-Deck.prototype.shuffle = function () { };
-Deck.prototype.deal = function () { };
-Deck.prototype.pop = function () { };
+}
 
 class Card {
     public rank: string;
     public suit: string;
-    
+
     constructor(rank, suit: string) {
         this.rank = rank;
         this.suit = suit;
