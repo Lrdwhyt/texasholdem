@@ -1,53 +1,3 @@
-/*var Player = function (name, money) {
-    var name;
-    var money;
-    var hand = [];
-    var controller;
-
-    var getName = function () {
-        return name;
-    }
-
-    var getHand = function () {
-        return hand;
-    }
-
-    var resetHand = function () {
-        hand = [];
-    }
-
-    var getMoney = function () {
-        return money;
-    }
-
-    var modMoney = function (amount) {
-        money += amount;
-    }
-
-    var setController = function (newController) {
-        controller = newController;
-    }
-
-    var getController = function () {
-        return controller;
-    }
-
-    var deal = function (card) {
-        hand.push(card);
-    }
-
-    return {
-        getName: getName,
-        getHand: getHand,
-        getMoney: getMoney,
-        modMoney: modMoney,
-        deal: deal,
-        getController: getController,
-        setController: setController,
-        resetHand: resetHand
-    }
-}*/
-
 class Player {
     private name: string;
     private money: number;
@@ -103,7 +53,7 @@ var UserController = function (player, root) {
         disableBetting();
         switch (e.target.id) {
             case "raise":
-                var amount = parseInt(document.getElementById("bet").value);
+                var amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
                 var callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.RAISE, amount));
@@ -259,36 +209,36 @@ var UserController = function (player, root) {
     }
 
     var restrictToValid = function (current, committed, minRaise, money) {
-        document.getElementById("all-in").disabled = false;
-        document.getElementById("fold").disabled = false;
+        (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
+        (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
 
         if (current - committed > 0) {
-            document.getElementById("call").disabled = false;
-            document.getElementById("check").disabled = true;
+            (<HTMLButtonElement>document.getElementById("call")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("check")).disabled = true;
             if (money >= current - committed) {
                 document.getElementById("call").textContent = "Call (-" + (current - committed) + ")";
             } else {
                 document.getElementById("call").textContent = "Call (-" + money + ")";
             }
         } else {
-            document.getElementById("call").disabled = true;
-            document.getElementById("check").disabled = false;
+            (<HTMLButtonElement>document.getElementById("call")).disabled = true;
+            (<HTMLButtonElement>document.getElementById("check")).disabled = false;
             document.getElementById("call").textContent = "Call";
         }
 
         if (minRaise + current - committed > money) {
-            document.getElementById("raise").disabled = true;
+            (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
         } else {
-            document.getElementById("raise").disabled = false;
+            (<HTMLButtonElement>document.getElementById("raise")).disabled = false;
         }
     }
 
     var disableBetting = function () {
-        document.getElementById("raise").disabled = true;
-        document.getElementById("call").disabled = true;
-        document.getElementById("all-in").disabled = true;
-        document.getElementById("check").disabled = true;
-        document.getElementById("fold").disabled = true;
+        (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
+        (<HTMLButtonElement>document.getElementById("call")).disabled = true;
+        (<HTMLButtonElement>document.getElementById("all-in")).disabled = true;
+        (<HTMLButtonElement>document.getElementById("check")).disabled = true;
+        (<HTMLButtonElement>document.getElementById("fold")).disabled = true;
     }
 
     //Allows game to notify player of events

@@ -63,15 +63,20 @@ let OfflineMatch = function () {
 var MatchController = function (match) {
     var match;
     document.getElementById("match-controls").addEventListener("click", function (e) {
-        if (e.target.id === "next-game") {
+        if ((<HTMLElement>e.target).id === "next-game") {
             match.startGame();
         }
     });
 }
 
-var Bet = function (type, amount?) {
-    this.type = type;
-    this.amount = amount;
+class Bet {
+    public type: BetType;
+    public amount: number;
+
+    constructor(type: BetType, amount?: number) {
+        this.type = type;
+        this.amount = amount;
+    }
 }
 
 var Pot = function () {
@@ -155,7 +160,7 @@ var Game = function (matchPlayers, button, matchCallback) {
             modMoney(winners[0], pot.size());
         } else { // Split pot
             for (var player of winners) {
-                modMoney(player, parseInt(pot.size() / winners.length));
+                modMoney(player, Math.floor(pot.size() / winners.length));
             }
         }
         return results;

@@ -48,12 +48,12 @@ class Card {
     public rank: string;
     public suit: string;
     
-    constructor(rank, suit) {
+    constructor(rank, suit: string) {
         this.rank = rank;
         this.suit = suit;
     }
 
-    equals(that) {
+    equals(that): boolean {
         return (this.rank == that.rank && this.suit == that.suit);
     }
 
@@ -69,7 +69,7 @@ class Card {
         return this.rank + this.suit;
     }
 
-    rankNumber() {
+    rankNumber(): number {
         return {
             2: 1,
             3: 2,
@@ -87,7 +87,7 @@ class Card {
         }[this.rank];
     }
 
-    rankNumberAceLow() {
+    rankNumberAceLow(): number {
         return {
             "A": 1,
             2: 2,
