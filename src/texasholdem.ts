@@ -15,50 +15,46 @@ enum BettingStage {
     COMPLETE
 };
 
-let OfflineMatch = function () {
+class OfflineMatch {
 
-    let players = [];
-    let game;
-    let buttonPosition: number = 0;
+    private players: Player[];
+    private game;
+    private buttonPosition: number;
 
-    var addPlayer = function (player) {
-        players.push(player);
+    constructor() {
+        this.players = [];
+        this.buttonPosition = 0;
     }
 
-    var dispatchEvent = function (e) {
+    addPlayer(player: Player): void {
+        this.players.push(player);
+    }
+
+    dispatchEvent(e): void {
         if (e instanceof DealtHandEvent) {
             e.player.getController().dispatchEvent(e);
             return;
         }
-
-        for (let player of players) {
+        for (let player of this.players) {
             player.getController().dispatchEvent(e);
         }
-
         if (e instanceof GameEndEvent) {
-            game = null;
-            for (let i = players.length - 1; i >= 0; --i) {
-                if (players[i].getMoney() <= 0) {
-                    players.splice(i, 1);
+            this.game = null;
+            for (let i = this.players.length - 1; i >= 0; --i) {
+                if (this.players[i].getMoney() <= 0) {
+                    this.players.splice(i, 1);
                 }
             }
         }
-
     }
 
-    var startGame = function () {
-        if (players.length >= 2 && (game === undefined || game === null)) {
-            game = new Game(players, buttonPosition, dispatchEvent);
+    startGame(): void {
+        if (this.players.length >= 2 && (this.game === undefined || this.game === null)) {
+            this.game = new Game(this.players, this.buttonPosition, this);
         }
     }
 
-    return {
-        addPlayer: addPlayer,
-        startGame: startGame,
-        dispatchEvent: dispatchEvent
-    }
-
-};
+}
 
 var MatchController = function (match) {
     var match;
@@ -111,7 +107,7 @@ Pot.prototype.remove = function (player) {
 var Game = function (matchPlayers, button, matchCallback) {
 
     var dispatchEvent = function (e) {
-        matchNotify(e);
+        parentMatch.dispatchEvent(e);
     }
 
     var modMoney = function (player, money) {
@@ -451,35 +447,35 @@ var Game = function (matchPlayers, button, matchCallback) {
     }
 
     var deal = function () {
-        for (var player of players) {
+        for (let player of players) {
             player.deal(deck.deal());
         }
-        for (var player of players) {
+        for (let player of players) {
             player.deal(deck.deal());
         }
     };
 
-    var players = matchPlayers.slice(0);
-    var bettingPlayers = matchPlayers.slice(0);
-    var unfoldedPlayers = matchPlayers.slice(0);
+    let players = matchPlayers.slice(0);
+    let bettingPlayers = matchPlayers.slice(0);
+    let unfoldedPlayers = matchPlayers.slice(0);
 
-    var matchNotify = matchCallback;
+    let parentMatch = matchCallback;
 
-    var deck = new Deck();
+    let deck: Deck = new Deck();
     deck.shuffle();
-    var flop = [];
-    var turn = [];
-    var river = [];
+    let flop = [];
+    let turn = [];
+    let river = [];
 
-    var bets = {};
-    var baselines = [];
-    var pots = [new Pot()];
+    let bets = {};
+    let baselines = [];
+    let pots = [new Pot()];
 
-    for (var player of players) {
+    for (let player of players) {
         bets[player.getName()] = 0;
     }
 
-    var bettingStage = BettingStage.NONE;
+    let bettingStage: BettingStage = BettingStage.NONE;
 
     for (let player of players) {
         player.resetHand();
@@ -520,8 +516,12 @@ var PlayerMoneyChangeEvent = function (player, change) {
     this.change = change;
 };
 
-var PotChangeEvent = function (pots) {
-    this.pots = pots;
+class PotChangeEvent {
+    public pots;
+
+    constructor(pots) {
+        this.pots = pots;
+    }
 }
 
 var GameStartEvent = function (players) {

@@ -53,20 +53,20 @@ var UserController = function (player: Player, root) {
         disableBetting();
         switch (e.target.id) {
             case "raise":
-                var amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
-                var callback = callbackFunction;
+                let amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
+                let callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.RAISE, amount));
                 break;
 
             case "call":
-                var callback = callbackFunction;
+                let callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.CALL));
                 break;
 
             case "all-in":
-                var callback = callbackFunction;
+                let callback = callbackFunction;
                 callbackFunction = null;
                 if (toCall > player.getMoney()) {
                     callback(player, new Bet(BetType.CALL));
@@ -76,13 +76,13 @@ var UserController = function (player: Player, root) {
                 break;
 
             case "fold":
-                var callback = callbackFunction;
+                let callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.FOLD));
                 break;
 
             case "check":
-                var callback = callbackFunction;
+                let callback = callbackFunction;
                 callbackFunction = null;
                 callback(player, new Bet(BetType.CHECK));
                 break;
@@ -176,13 +176,13 @@ var UserController = function (player: Player, root) {
     }
 
     var drawPlayer = function (player) {
-        var playerRoot = document.createElement("div");
+        let playerRoot = document.createElement("div");
         playerRoot.setAttribute("name", player.getName());
         playerRoot.className = "player";
-        var name = document.createElement("div");
+        let name = document.createElement("div");
         name.className = "name";
         name.textContent = player.getName();
-        var money = document.createElement("div");
+        let money = document.createElement("div");
         money.className = "money";
         money.textContent = player.getMoney();
         let text = document.createElement("div");
@@ -255,7 +255,7 @@ var UserController = function (player: Player, root) {
 
         } else if (e instanceof DealtHandEvent) {
 
-            for (var card of e.hand) {
+            for (let card of e.hand) {
                 document.getElementById("user-cards").appendChild(card.getImage());
             }
 
@@ -308,7 +308,7 @@ var UserController = function (player: Player, root) {
 
         } else if (e instanceof DealtFlopEvent) {
 
-            for (var card of e.cards) {
+            for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("Flop dealt")
@@ -316,7 +316,7 @@ var UserController = function (player: Player, root) {
 
         } else if (e instanceof DealtTurnEvent) {
 
-            for (var card of e.cards) {
+            for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("Turn dealt")
@@ -324,7 +324,7 @@ var UserController = function (player: Player, root) {
 
         } else if (e instanceof DealtRiverEvent) {
 
-            for (var card of e.cards) {
+            for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
             console.log("River dealt")
@@ -337,8 +337,8 @@ var UserController = function (player: Player, root) {
                     if (e.result[key].player === player.getName()) {
                         return;
                     }
-                    var ele = document.querySelector("[name=" + e.result[key].player + "]");
-                    for (var card of e.result[key].cards) {
+                    let ele = document.querySelector("[name=" + e.result[key].player + "]");
+                    for (let card of e.result[key].cards) {
                         ele.appendChild(card.getImage());
                     }
                     let score = document.createElement("div");
