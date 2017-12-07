@@ -261,7 +261,6 @@ var Game = function (matchPlayers, button, matchCallback) {
                 } else {
                     return false;
                 }
-                break;
 
             case BetType.RAISE:
                 let toCallDifference = currentBet - bets[player.getName()];
@@ -270,7 +269,6 @@ var Game = function (matchPlayers, button, matchCallback) {
                 } else {
                     return false;
                 }
-                break;
 
             case BetType.CHECK:
                 if (currentBet - bets[player.getName()] === 0) {
@@ -278,11 +276,9 @@ var Game = function (matchPlayers, button, matchCallback) {
                 } else {
                     return false;
                 }
-                break;
 
             case BetType.FOLD:
                 return true;
-                break;
 
             default:
                 return false;

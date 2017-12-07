@@ -2,7 +2,7 @@ class Player {
     private name: string;
     private money: number;
     private hand: Card[];
-    private controller;
+    private controller: Controller;
 
     constructor(name: string, money: number) {
         this.name = name;
@@ -43,7 +43,11 @@ class Player {
     }
 }
 
-class UserController {
+interface Controller {
+    dispatchEvent(e: any): void;
+}
+
+class UserController implements Controller {
     callbackFunction;
     player: Player;
     root: HTMLElement;
@@ -58,14 +62,14 @@ class UserController {
     placeBet(bet: Bet) {
         //if (isValidBet(this.player, bet)) {
         if (true) {
-            this.callbackFunction(this.player, bet);
             this.view.disableBetting();
+            this.callbackFunction(this.player, bet);
         } else {
-            //this.view.notifyInvalidBet();
+            this.view.notifyInvalidBet();
         }
     }
 
-    dispatchEvent = function (e) {
+    dispatchEvent(e): void {
 
         if (e instanceof GameStartEvent) {
             console.log("Game started");
@@ -325,7 +329,6 @@ class UserView {
     }
 
     updatePot(pots) {
-
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
             document.getElementById("pots").textContent = "Main pot: " + pots[0].size();
         } else {
