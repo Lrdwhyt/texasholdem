@@ -69,7 +69,7 @@ var MatchController = function (match) {
     });
 }
 
-var Bet = function (type, amount) {
+var Bet = function (type, amount?) {
     this.type = type;
     this.amount = amount;
 }

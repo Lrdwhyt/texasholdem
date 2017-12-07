@@ -44,61 +44,67 @@ Deck.prototype.shuffle = function () { };
 Deck.prototype.deal = function () { };
 Deck.prototype.pop = function () { };
 
-var Card = function (rank, suit) {
-    this.rank = rank;
-    this.suit = suit;
-};
+class Card {
+    public rank: string;
+    public suit: string;
+    
+    constructor(rank, suit) {
+        this.rank = rank;
+        this.suit = suit;
+    }
 
-Card.prototype.equals = function (that) {
-    return (this.rank == that.rank && this.suit == that.suit);
-};
+    equals(that) {
+        return (this.rank == that.rank && this.suit == that.suit);
+    }
 
-Card.prototype.getImage = function () {
-    let img = document.createElement("img");
-    img.src = "cards-svg/" + this.rank + this.suit + ".png";
-    img.alt = this.toString();
-    img.className = "card";
-    return img;
-};
+    getImage(): HTMLElement {
+        let img = document.createElement("img");
+        img.src = "cards-svg/" + this.rank + this.suit + ".png";
+        img.alt = this.toString();
+        img.className = "card";
+        return img;
+    }
 
-Card.prototype.toString = function () {
-    return this.rank + this.suit;
-}
+    toString(): string {
+        return this.rank + this.suit;
+    }
 
-Card.prototype.rankNumber = function () {
-    return {
-        2: 1,
-        3: 2,
-        4: 3,
-        5: 4,
-        6: 5,
-        7: 6,
-        8: 7,
-        9: 8,
-        10: 9,
-        "J": 10,
-        "Q": 11,
-        "K": 12,
-        "A": 13,
-    }[this.rank];
-}
+    rankNumber() {
+        return {
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5,
+            7: 6,
+            8: 7,
+            9: 8,
+            10: 9,
+            "J": 10,
+            "Q": 11,
+            "K": 12,
+            "A": 13,
+        }[this.rank];
+    }
 
-Card.prototype.rankNumberAceLow = function () {
-    return {
-        "A": 1,
-        2: 2,
-        3: 3,
-        4: 4,
-        5: 5,
-        6: 6,
-        7: 7,
-        8: 8,
-        9: 9,
-        10: 10,
-        "J": 11,
-        "Q": 12,
-        "K": 13
-    }[this.rank];
+    rankNumberAceLow() {
+        return {
+            "A": 1,
+            2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+            6: 6,
+            7: 7,
+            8: 8,
+            9: 9,
+            10: 10,
+            "J": 11,
+            "Q": 12,
+            "K": 13
+        }[this.rank];
+    }
+
 }
 
 var Hands = (function () {

@@ -1,4 +1,4 @@
-var Player = function (name, money) {
+/*var Player = function (name, money) {
     var name;
     var money;
     var hand = [];
@@ -46,10 +46,55 @@ var Player = function (name, money) {
         setController: setController,
         resetHand: resetHand
     }
+}*/
+
+class Player {
+    private name: string;
+    private money: number;
+    private hand;
+    private controller;
+
+    constructor(name: string, money: number) {
+        this.name = name;
+        this.money = money;
+        this.hand = [];
+    }
+
+    getName() {
+        return this.name;
+    }
+
+    getHand() {
+        return this.hand;
+    }
+
+    resetHand() {
+        this.hand = [];
+    }
+
+    getMoney(): number {
+        return this.money;
+    }
+
+    modMoney(amount: number) {
+        this.money += amount;
+    }
+
+    setController(newController) {
+        this.controller = newController;
+    }
+
+    getController() {
+        return this.controller;
+    }
+
+    deal(card) {
+        this.hand.push(card);
+    }
 }
 
 var UserController = function (player, root) {
-    var callbackFunction;
+    let callbackFunction;
     var player;
     var root;
     let toCall = 0;
@@ -238,7 +283,7 @@ var UserController = function (player, root) {
         }
     }
 
-    var disableBetting = function() {
+    var disableBetting = function () {
         document.getElementById("raise").disabled = true;
         document.getElementById("call").disabled = true;
         document.getElementById("all-in").disabled = true;
