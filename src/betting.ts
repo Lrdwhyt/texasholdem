@@ -17,9 +17,9 @@ class Bet {
 }
 
 class Pot {
-    baseline: number;
-    bets;
-    players: Player[];
+    public baseline: number;
+    public bets;
+    public players: Player[];
 
     constructor() {
         this.players = [];

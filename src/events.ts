@@ -14,7 +14,7 @@ class PlayerMoneyChangeEvent implements GameEvent {
     public player: Player;
     public change: number;
 
-    constructor(player, change) {
+    constructor(player: Player, change: number) {
         this.player = player;
         this.change = change;
     }
