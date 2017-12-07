@@ -86,11 +86,11 @@ class Pot {
         this.baseline = 0;
     }
 
-    add(player, amount) {
+    add(player: Player, amount: number) {
         if (this.players.indexOf(player) === -1) {
             this.players.push(player);
         }
-        this.bets[player.getName()] = parseInt(amount);
+        this.bets[player.getName()] = amount;
     }
 
     size(): number {
@@ -102,7 +102,7 @@ class Pot {
         return size;
     }
 
-    remove(player) {
+    remove(player): void {
         let index = this.players.indexOf(player);
         if (index >= 0) {
             this.players.splice(index, 1);
@@ -216,7 +216,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         dispatchEvent(new PotChangeEvent(pots));
     }
 
-    var deductAntes = function (ante) {
+    var deductAntes = function (ante: number) {
         for (let player of players) {
             if (player.getMoney() >= ante) {
                 bets[player.getName()] += ante;
@@ -234,7 +234,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     }
 
-    var getNextPlayer = function (player) {
+    var getNextPlayer = function (player: Player): Player {
         var i = bettingPlayers.indexOf(player);
         ++i;
         if (i >= bettingPlayers.length) {
@@ -244,7 +244,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     }
 
-    var getPrevPlayer = function (player) {
+    var getPrevPlayer = function (player: Player): Player {
         var i = bettingPlayers.indexOf(player);
         if (i === 0) {
             return bettingPlayers[bettingPlayers.length - 1];
@@ -253,7 +253,7 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     }
 
-    var isValidBet = function (player, bet) {
+    var isValidBet = function (player: Player, bet: Bet) {
         switch (bet.type) {
             case BetType.CALL:
                 if (currentBet - bets[player.getName()] > 0 && player.getMoney() > 0) {
@@ -283,10 +283,13 @@ var Game = function (matchPlayers, button, matchCallback) {
             case BetType.FOLD:
                 return true;
                 break;
+
+            default:
+                return false;
         }
     }
 
-    var removeFromBetting = function (player) {
+    var removeFromBetting = function (player: Player) {
         if (player === lastPlayer) {
             lastPlayer = getPrevPlayer(lastPlayer);
         }
@@ -302,10 +305,10 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     }
 
-    var processBet = function (player, bet) {
+    var processBet = function (player: Player, bet: Bet) {
         switch (bet.type) {
             case BetType.CALL:
-                var toCallDifference = currentBet - bets[player.getName()];
+                let toCallDifference = currentBet - bets[player.getName()];
                 if (player.getMoney() > toCallDifference) {
                     bets[player.getName()] += toCallDifference;
                     modMoney(player, -toCallDifference);
@@ -462,21 +465,21 @@ var Game = function (matchPlayers, button, matchCallback) {
         }
     };
 
-    let players = matchPlayers.slice(0);
-    let bettingPlayers = matchPlayers.slice(0);
-    let unfoldedPlayers = matchPlayers.slice(0);
+    let players: Player[] = matchPlayers.slice(0);
+    let bettingPlayers: Player[] = matchPlayers.slice(0);
+    let unfoldedPlayers: Player[] = matchPlayers.slice(0);
 
     let parentMatch = matchCallback;
 
     let deck: Deck = new Deck();
     deck.shuffle();
-    let flop = [];
-    let turn = [];
-    let river = [];
+    let flop: Card[] = [];
+    let turn: Card[] = [];
+    let river: Card[] = [];
 
     let bets = {};
-    let baselines = [];
-    let pots = [new Pot()];
+    let baselines: number[] = [];
+    let pots: Pot[] = [new Pot()];
 
     for (let player of players) {
         bets[player.getName()] = 0;
@@ -491,11 +494,11 @@ var Game = function (matchPlayers, button, matchCallback) {
     dispatchEvent(new GameStartEvent(players));
 
     let ante: number = 25;
-    let firstPlayer = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
-    let currentPlayer = firstPlayer;
-    let lastPlayer = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
+    let firstPlayer: Player = getPrevPlayer(players[button]); //Keep track of where to resume betting each round
+    let currentPlayer: Player = firstPlayer;
+    let lastPlayer: Player = getPrevPlayer(currentPlayer); //Where to end betting if no one raises
     let lastPlayerFlag: boolean = false;
-    let lastRaiser = null;
+    let lastRaiser: Player = null;
     let currentBet: number = ante;
     let minRaise: number = ante * 2;
 
