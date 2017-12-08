@@ -114,22 +114,22 @@ class UserController implements Controller {
             switch (e.bet.type) {
                 case BetType.RAISE:
                     msg = e.player.getName() + " raised to " + e.bet.amount;
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "bet $" + e.bet.amount;
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " bet $" + e.bet.amount;
                     break;
 
                 case BetType.CALL:
                     msg = e.player.getName() + " called"
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "called";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " called";
                     break;
 
                 case BetType.CHECK:
                     msg = e.player.getName() + " checked"
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "checked";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " checked";
                     break;
 
                 case BetType.FOLD:
                     msg = e.player.getName() + " folded";
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "folded";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " folded";
                     document.querySelector("[name=" + e.player.getName() + "]").className += " folded";
                     break;
 
@@ -256,13 +256,13 @@ class UserView {
         playerRoot.className = "player";
         let playerInfo = document.createElement("div");
         playerInfo.className = "player-info";
-        let name = document.createElement("div");
+        let name = document.createElement("span");
         name.className = "name";
         name.textContent = player.getName();
         let money = document.createElement("div");
         money.className = "money";
         money.textContent = player.getMoney().toString();
-        let text = document.createElement("div");
+        let text = document.createElement("span");
         text.className = "text";
         playerInfo.appendChild(name);
         playerInfo.appendChild(text);

@@ -1,4 +1,5 @@
 html, body {
+    color: #fff;
     margin: 0;
 }
 
@@ -93,7 +94,8 @@ html, body {
 }
 
 #user button {
-    height: 2em;
+    height: 40px;
+    width: 100px;
 }
 
 .player-info {
@@ -123,7 +125,7 @@ html, body {
 
 .player .text {
     font-size: 1em;
-    padding-left: 4px;
+    white-space: pre;
 }
 
 .player .name, .player .text {
