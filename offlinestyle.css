@@ -2,8 +2,20 @@ html, body {
     margin: 0;
 }
 
+#primary-nav {
+    background: #223;
+    height: 2em;
+}
+
+#secondary-nav {
+    background: #345;
+    height: 2em;
+}
+
 #container {
+    background: #456;
     min-width: 1080px;
+    padding-top: 10px;
 }
 
 #match-controls {
@@ -43,21 +55,12 @@ html, body {
 
 .player {
     flex: 0 0 30%;
-    min-height: 180px;
     min-width: 160px;
 }
 
 .player .card {
     width: 70px;
     margin: 0 1px;
-}
-
-.player.folded {
-    color: #ccc;
-}
-
-.name {
-    font-weight: bold;
 }
 
 #user {
@@ -93,6 +96,47 @@ html, body {
     height: 2em;
 }
 
+.player-info {
+    background: #333;
+    color: #eee;
+    width: 180px;
+    text-align: left;
+    margin: 0 auto;
+}
+
+.player.folded .player-info {
+    background: #456;
+    color: #aaa;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.player .name {
+    color: #fa7;
+}
+
+.player .money {
+    font-size: 0.8em;
+}
+
+.player .text {
+    font-size: 1em;
+    padding-left: 4px;
+}
+
+.player .name, .player .text {
+    display: inline-block;
+    font-size: 0.8em;
+}
+
+.player .name, .player .money {
+    margin: 0 auto;
+    padding-left: 10px;
+    text-align: left;
+}
+
 #board .card {
     margin: 0 5px;
 }
@@ -109,7 +153,9 @@ html, body {
 }
 
 #pots {
-    position: fixed;
-    left: 0;
-    bottom: 0;
+    position: absolute;
+    left: calc(50% - 325px);
+    text-align: center;
+    top: calc(50% - 97px - 1.5em);
+    width: 650px;
 }

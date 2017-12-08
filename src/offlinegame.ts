@@ -12,10 +12,12 @@ class OfflineMatch {
     private players: Player[];
     private game: OfflineGame;
     private buttonPosition: number;
+    private hands: number;
 
     constructor() {
         this.players = [];
         this.buttonPosition = 0;
+        this.hands = 0;
     }
 
     addPlayer(player: Player): void {
@@ -42,6 +44,11 @@ class OfflineMatch {
 
     startGame(): void {
         if (this.players.length >= 2 && (this.game === undefined || this.game === null)) {
+            ++this.buttonPosition;
+            if (this.buttonPosition >= this.players.length) {
+                this.buttonPosition = 0;
+            }
+            ++this.hands;
             this.game = new OfflineGame(this.players, this.buttonPosition, this);
         }
     }
@@ -106,7 +113,7 @@ class OfflineGame {
         this.baselines = [];
         this.pots = [new Pot()];
 
-        this.ante = 20;
+        this.ante = 50;
         this.currentBet = this.ante;
         this.minRaise = this.ante * 2;
 
@@ -236,7 +243,7 @@ class OfflineGame {
     }
 
     processPot(pot): any {
-        if (pot.players.length === 1) {
+        if (pot.players.length === 1) { // Only one player eligible for pot, who automatically wins it.
             this.modMoney(pot.players[0], pot.size());
             return {
                 player: pot.players[0],

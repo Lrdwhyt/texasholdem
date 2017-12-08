@@ -88,7 +88,7 @@ class UserController implements Controller {
             this.view.drawBoard(otherPlayers);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
-            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = e.player.getMoney().toString();
+            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = "$" + e.player.getMoney().toString();
             console.log(e.player.getName() + " money changed: " + e.change);
 
         } else if (e instanceof DealtHandEvent) {
@@ -114,22 +114,22 @@ class UserController implements Controller {
             switch (e.bet.type) {
                 case BetType.RAISE:
                     msg = e.player.getName() + " raised to " + e.bet.amount;
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "BET " + e.bet.amount;
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "bet $" + e.bet.amount;
                     break;
 
                 case BetType.CALL:
                     msg = e.player.getName() + " called"
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "CALLED";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "called";
                     break;
 
                 case BetType.CHECK:
                     msg = e.player.getName() + " checked"
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "CHECKED";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "checked";
                     break;
 
                 case BetType.FOLD:
                     msg = e.player.getName() + " folded";
-                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "FOLDED";
+                    document.querySelector("[name=" + e.player.getName() + "] .text").textContent = "folded";
                     document.querySelector("[name=" + e.player.getName() + "]").className += " folded";
                     break;
 
@@ -180,9 +180,7 @@ class UserController implements Controller {
                         for (let card of e.result[key].cards) {
                             ele.appendChild(card.getImage());
                         }
-                        let score = document.createElement("div");
-                        score.textContent = e.result[key].score;
-                        ele.appendChild(score);
+                        console.log(e.result[key].player + ":" + e.result[key].score);
                     }
                 });
             }
@@ -256,6 +254,8 @@ class UserView {
         let playerRoot = document.createElement("div");
         playerRoot.setAttribute("name", player.getName());
         playerRoot.className = "player";
+        let playerInfo = document.createElement("div");
+        playerInfo.className = "player-info";
         let name = document.createElement("div");
         name.className = "name";
         name.textContent = player.getName();
@@ -264,9 +264,10 @@ class UserView {
         money.textContent = player.getMoney().toString();
         let text = document.createElement("div");
         text.className = "text";
-        playerRoot.appendChild(name);
-        playerRoot.appendChild(money);
-        playerRoot.appendChild(text);
+        playerInfo.appendChild(name);
+        playerInfo.appendChild(text);
+        playerInfo.appendChild(money);
+        playerRoot.appendChild(playerInfo);
         return playerRoot;
     }
 
@@ -341,13 +342,13 @@ class UserView {
 
     updatePot(pots) {
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
-            document.getElementById("pots").textContent = "Main pot: " + pots[0].size();
+            document.getElementById("pots").textContent = "Pot: $" + pots[0].size();
         } else {
             for (let index in pots) {
                 if (index === "0") {
-                    document.getElementById("pots").textContent = "Main pot: " + pots[index].size();
+                    document.getElementById("pots").textContent = "Main pot: $" + pots[index].size();
                 } else if (pots[index].players.length > 1) {
-                    document.getElementById("pots").textContent += ", Side pot " + index + ": " + pots[index].size();
+                    document.getElementById("pots").textContent += ", side pot " + index + ": $" + pots[index].size();
                 }
             }
         }
