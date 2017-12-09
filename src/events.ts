@@ -90,8 +90,10 @@ class DealtRiverEvent implements GameEvent {
 
 class GameEndEvent implements GameEvent {
     public result;
+    public moneyChange;
 
-    constructor(result) {
+    constructor(result, moneyChange) {
         this.result = result;
+        this.moneyChange = moneyChange;
     }
 }

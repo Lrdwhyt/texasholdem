@@ -171,11 +171,20 @@ class UserController implements Controller {
         } else if (e instanceof GameEndEvent) {
 
             if (e.result) {
+                for (let playerName in e.moneyChange) {
+                    if (e.moneyChange[playerName] > 0) {
+                        let ele = document.querySelector("[name=" + playerName + "] .money");
+                        ele.textContent += " (+" + e.moneyChange[playerName] + ")";
+                    } else if (e.moneyChange[playerName] < 0) {
+                        let ele = document.querySelector("[name=" + playerName + "] .money");
+                        ele.textContent += " (" + e.moneyChange[playerName] + ")";
+                    }
+                }
                 Object.keys(e.result).forEach((key, i) => {
                     if (e.result[key].player === this.player.getName()) {
                         return;
                     }
-                    let ele = document.querySelector("[name=" + e.result[key].player + "]");
+                    let ele = document.querySelector("[name=" + e.result[key].player + "] .cards");
                     if (e.result[key].showdown === true) {
                         for (let card of e.result[key].cards) {
                             ele.appendChild(card.getImage());
@@ -256,6 +265,9 @@ class UserView {
         playerRoot.className = "player";
         let playerInfo = document.createElement("div");
         playerInfo.className = "player-info";
+
+        let cards = document.createElement("div");
+        cards.className = "cards";
         let name = document.createElement("span");
         name.className = "name";
         name.textContent = player.getName();
@@ -264,6 +276,7 @@ class UserView {
         money.textContent = player.getMoney().toString();
         let text = document.createElement("span");
         text.className = "text";
+        playerRoot.appendChild(cards);
         playerInfo.appendChild(name);
         playerInfo.appendChild(text);
         playerInfo.appendChild(money);
@@ -272,7 +285,26 @@ class UserView {
     }
 
     drawUser(player: Player) {
-        document.getElementById("user-info").appendChild(this.drawPlayer(player));
+        let playerRoot = document.createElement("div");
+        playerRoot.setAttribute("name", player.getName());
+        playerRoot.className = "player";
+        let playerInfo = document.createElement("div");
+        playerInfo.className = "player-info";
+
+        let name = document.createElement("span");
+        name.className = "name";
+        name.textContent = player.getName();
+        let money = document.createElement("div");
+        money.className = "money";
+        money.textContent = player.getMoney().toString();
+        let text = document.createElement("span");
+        text.className = "text";
+
+        playerInfo.appendChild(name);
+        playerInfo.appendChild(text);
+        playerInfo.appendChild(money);
+        playerRoot.appendChild(playerInfo);
+        document.getElementById("user-info").appendChild(playerRoot);
     }
 
     drawBoard(players: Player[]) {

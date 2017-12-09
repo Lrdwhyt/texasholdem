@@ -4,7 +4,7 @@ html, body {
 }
 
 #primary-nav {
-    background: #223;
+    background: #234;
     height: 2em;
 }
 
@@ -17,11 +17,6 @@ html, body {
     background: #456;
     min-width: 1080px;
     padding-top: 10px;
-}
-
-#match-controls {
-    position: fixed;
-    z-index: 3;
 }
 
 #match-controls button {
@@ -46,7 +41,6 @@ html, body {
 #players-top {
     display: flex;
     flex-direction: row;
-    flex: 1 1 50%;
     text-align: center;
 }
 
@@ -65,16 +59,13 @@ html, body {
 }
 
 #user {
-    bottom: 10px;
-    position: absolute;
     text-align: center;
     width: 100%;
 }
 
 #user-info {
-    display: inline-block;
     height: 100px;
-    min-width: 120px;
+    width: 180px;
     vertical-align: bottom;
 }
 
@@ -93,9 +84,18 @@ html, body {
     margin: 0 3px;
 }
 
+#bet-controls, #user-stuff {
+    display: inline-block;
+}
+
 #user button {
+    display: block;
     height: 40px;
     width: 100px;
+}
+
+.player .cards {
+    height: 102px;
 }
 
 .player-info {
@@ -144,20 +144,38 @@ html, body {
 }
 
 #board {
+    border: 2px solid #678;
+    border-radius: 3px;
     margin: 0 auto;
-    height: 30%;
-    min-height: 190px;
+    height: 174px;
+    padding: 5px 0;
     text-align: left;
     width: 650px;
-    position: absolute;
-    left: calc(50% - 325px);
-    top: calc(50% - 97px);
 }
 
 #pots {
-    position: absolute;
-    left: calc(50% - 325px);
+    height: 1em;
+    padding-top: 0.5em;
     text-align: center;
-    top: calc(50% - 97px - 1.5em);
-    width: 650px;
+}
+
+#center-column {
+    display: flex;
+    flex: 1 1 50%;
+    flex-direction: column;
+}
+
+#players-top {
+    flex: 1 1 25%;
+}
+
+#center-board {
+    flex: 1 1 50%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#user {
+    flex: 1 1 25%;
 }

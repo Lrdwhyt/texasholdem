@@ -467,7 +467,7 @@ class AIController implements Controller {
 
                 }
 
-                setTimeout(() => e.callback(this.player, bet), 800);
+                setTimeout(() => e.callback(this.player, bet), 700);
 
             }
 

@@ -25,23 +25,33 @@
             <button id="next-game">Next game</button>
         </div>
         <div id="players">
-            <div id="players-left"></div><div id="players-top"></div><div id="players-right"></div>
-        </div>
-        <div>
-            <div id="board"></div>
-            <div id="pots"></div>
-        </div>
-        <div id="user">
-            <div id="user-info"></div>
-            <div id="user-cards"></div>
-            <div>
-                Bet
-                <input type="text" id="bet">
-                <span id="actions">
-                    <button id="raise">Raise</button><button id="all-in">All-in</button><button id="call">Call</button><button id="check">Check</button><button id="fold">Fold</button>
-                </span>
+            <div id="players-left"></div>
+            <div id="center-column">
+                <div id="players-top"></div>
+                <div id="center-board">
+                    <div id="board"></div>
+                    <div id="pots"></div>
+                </div>
+                <div id="user">
+                    <div id="user-stuff">
+                        <div id="user-cards"></div>
+                        <div id="user-info"></div>
+                    </div>
+                    <div id="bet-controls">
+                        <input type="text" id="bet">
+                        <span id="actions">
+                            <button id="raise">Raise</button>
+                            <button id="all-in">All-in</button>
+                            <button id="call">Call</button>
+                            <button id="check">Check</button>
+                            <button id="fold">Fold</button>
+                        </span>
+                    </div>
+                </div>
             </div>
+            <div id="players-right"></div>
         </div>
+        
     </div>
 </body>
 

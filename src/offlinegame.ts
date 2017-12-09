@@ -49,7 +49,7 @@ class OfflineMatch {
                 this.buttonPosition = 0;
             }
             ++this.hands;
-            this.game = new OfflineGame(this.players, this.buttonPosition, this);
+            this.game = new OfflineGame(this.players, this.buttonPosition, this, 50 * Math.pow(3, Math.floor(this.hands / 5)));
         }
     }
 
@@ -81,6 +81,7 @@ class OfflineGame {
     private bets: { [name: string]: number };
     private baselines: number[];
     private pots: Pot[];
+    private initialMoney: { [name: string]: number };
 
     private ante: number;
     private currentBet: number;
@@ -96,7 +97,7 @@ class OfflineGame {
     private button: number;
     private match: OfflineMatch;
 
-    constructor(players: Player[], button: number, match: OfflineMatch) {
+    constructor(players: Player[], button: number, match: OfflineMatch, ante: number) {
         this.match = match;
 
         this.players = players.slice(0);
@@ -112,8 +113,9 @@ class OfflineGame {
         this.bets = {};
         this.baselines = [];
         this.pots = [new Pot()];
+        this.initialMoney = {};
 
-        this.ante = 50;
+        this.ante = ante;
         this.currentBet = this.ante;
         this.minRaise = this.ante * 2;
 
@@ -135,6 +137,7 @@ class OfflineGame {
     init(): void {
         for (let player of this.players) {
             this.bets[player.getName()] = 0;
+            this.initialMoney[player.getName()] = player.getMoney();
             player.resetHand();
         }
 
@@ -439,7 +442,11 @@ class OfflineGame {
                 this.processPot(this.pots[index]);
             }
         }
-        this.dispatchEvent(new GameEndEvent(result));
+        let moneyChange = {};
+        for (let player of this.players) {
+            moneyChange[player.getName()] = player.getMoney() - this.initialMoney[player.getName()];
+        }
+        this.dispatchEvent(new GameEndEvent(result, moneyChange));
     }
 
     finishToEnd(): void {
@@ -461,7 +468,11 @@ class OfflineGame {
                 this.processPot(this.pots[index]);
             }
         }
-        this.dispatchEvent(new GameEndEvent(result));
+        let moneyChange = {};
+        for (let player of this.players) {
+            moneyChange[player.getName()] = player.getMoney() - this.initialMoney[player.getName()];
+        }
+        this.dispatchEvent(new GameEndEvent(result, moneyChange));
     }
 
     makeBet = (player: Player, bet: Bet): void => {
