@@ -387,6 +387,7 @@ class UserView {
     }
 
     restrictToValid(current, committed, minRaise, money) {
+        (<HTMLInputElement>document.getElementById("bet")).value = current - committed + minRaise;
         (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
         (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
 
