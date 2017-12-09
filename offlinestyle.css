@@ -15,8 +15,14 @@ html, body {
 
 #container {
     background: #456;
+    min-height: 600px;
     min-width: 1080px;
     padding-top: 10px;
+    height: calc(100vh - 4em - 10px);
+}
+
+#match-controls {
+    display: inline-block;
 }
 
 #match-controls button {
@@ -26,6 +32,7 @@ html, body {
 #players {
     display: flex;
     flex-direction: row;
+    height: 100%;
 }
 
 #players-left, #players-right {
@@ -34,7 +41,7 @@ html, body {
     flex: 1 1 25%;
     flex-direction: column;
     justify-content: center;
-    height: 100vh;
+    height: 100%;
     text-align: center;
 }
 
@@ -64,9 +71,7 @@ html, body {
 }
 
 #user-info {
-    height: 100px;
     width: 180px;
-    vertical-align: bottom;
 }
 
 #user .player {
@@ -107,8 +112,7 @@ html, body {
 }
 
 .player.folded .player-info {
-    background: #456;
-    color: #aaa;
+    opacity: 0.2;
 }
 
 .name {
@@ -166,16 +170,16 @@ html, body {
 }
 
 #players-top {
-    flex: 1 1 25%;
+    flex: 1 1 150px;
 }
 
 #center-board {
-    flex: 1 1 50%;
+    flex: 1 1 230px;
     justify-content: center;
     display: flex;
     flex-direction: column;
 }
 
 #user {
-    flex: 1 1 25%;
+    flex: 1 1 200px;
 }
