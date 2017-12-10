@@ -51,6 +51,47 @@ html, body {
     text-align: center;
 }
 
+#board .card {
+    margin: 0 5px;
+}
+
+#board {
+    border: 2px solid #678;
+    border-radius: 3px;
+    margin: 0 auto;
+    height: 174px;
+    padding: 5px 0;
+    text-align: left;
+    width: 650px;
+}
+
+#pots {
+    height: 1em;
+    padding-top: 0.5em;
+    text-align: center;
+}
+
+#center-column {
+    display: flex;
+    flex: 1 1 50%;
+    flex-direction: column;
+}
+
+#players-top {
+    flex: 1 1 150px;
+}
+
+#center-board {
+    flex: 1 1 230px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#user {
+    flex: 1 1 200px;
+}
+
 #players-top .player {
     flex: 1 1;
 }
@@ -87,16 +128,6 @@ html, body {
 
 #user-cards .card {
     margin: 0 3px;
-}
-
-#bet-controls, #user-stuff {
-    display: inline-block;
-}
-
-#user button {
-    display: block;
-    height: 40px;
-    width: 100px;
 }
 
 .player .cards {
@@ -143,43 +174,34 @@ html, body {
     text-align: left;
 }
 
-#board .card {
-    margin: 0 5px;
+#bet-controls, #user-stuff {
+    display: inline-block;
 }
 
-#board {
-    border: 2px solid #678;
-    border-radius: 3px;
-    margin: 0 auto;
-    height: 174px;
-    padding: 5px 0;
-    text-align: left;
-    width: 650px;
+#bet-controls input, #bet-controls button {
+    font-size: 16px;
 }
 
-#pots {
-    height: 1em;
-    padding-top: 0.5em;
-    text-align: center;
+#bet {
+    border: none;
+    height: 40px;
+    padding: 0;
+    width: 80px;
 }
 
-#center-column {
-    display: flex;
-    flex: 1 1 50%;
-    flex-direction: column;
+#raise {
+    border: none;
+    height: 40px;
+    width: 60px !important;
 }
 
-#players-top {
-    flex: 1 1 150px;
+#decrease-bet, #increase-bet {
+    border: none;
+    height: 40px;
+    width: 30px;
 }
 
-#center-board {
-    flex: 1 1 230px;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-}
-
-#user {
-    flex: 1 1 200px;
+#call, #check, #all-in, #fold {
+    height: 40px;
+    width: 200px !important;
 }
