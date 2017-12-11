@@ -45,5 +45,8 @@
 
     window.onload = function () {
         startMatch();
+        document.getElementById("next-match").addEventListener("click", function() {
+            startMatch();
+        });
     }
 })();

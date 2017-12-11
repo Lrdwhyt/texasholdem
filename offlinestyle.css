@@ -190,13 +190,11 @@ html, body {
 }
 
 #raise {
-    border: none;
     height: 40px;
     width: 60px !important;
 }
 
 #decrease-bet, #increase-bet {
-    border: none;
     height: 40px;
     width: 30px;
 }
