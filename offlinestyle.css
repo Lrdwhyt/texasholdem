@@ -13,20 +13,20 @@ html, body {
     height: 2em;
 }
 
+#primary-nav div {
+    display: inline-block;
+}
+
+#secondary-nav div {
+    display: inline-block;
+}
+
 #container {
     background: #456;
     min-height: 600px;
     min-width: 1080px;
     padding-top: 10px;
     height: calc(100vh - 4em - 10px);
-}
-
-#match-controls {
-    display: inline-block;
-}
-
-#match-controls button {
-    height: 2em;
 }
 
 #players {

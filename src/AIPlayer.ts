@@ -467,7 +467,7 @@ class AIController implements Controller {
 
                 }
 
-                setTimeout(() => e.callback(this.player, bet), 700);
+                setTimeout(() => e.callback(this.player, bet), 700); // delay AI moves to make game more realistic
 
             }
 

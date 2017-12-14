@@ -1,5 +1,43 @@
 (function () {
     var startMatch = function() {
+
+
+        document.getElementById("container").innerHTML = `<div id="players">
+            <div id="players-left"></div>
+            <div id="center-column">
+                <div id="players-top"></div>
+                <div id="center-board">
+                    <div id="board"></div>
+                    <div id="pots"></div>
+                </div>
+                <div id="user">
+                    <div id="user-stuff">
+                        <div id="user-cards"></div>
+                        <div id="user-info"></div>
+                    </div>
+                    <div id="bet-controls">
+                        <span id="actions">
+                            <div>
+                                <button id="fold">Fold</button>
+                            </div>
+                            <div>
+                                <button id="all-in">All-in</button>
+                            </div>
+                            <div>
+                                <button id="decrease-bet">-</button><input type="text" id="bet"><button id="increase-bet">+</button><button id="raise">Raise</button>
+                            </div>
+                            <div>
+                                <button id="call">Call</button>
+                            </div>
+                            <div>
+                                <button id="check">Check</button>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div id="players-right"></div>`;
+
         var m = new OfflineMatch();
         var mc = new MatchController(m);
 

@@ -60,10 +60,8 @@ class MatchController {
 
     constructor(match: OfflineMatch) {
         this.match = match;
-        document.getElementById("match-controls").addEventListener("click", (e) => {
-            if ((<HTMLElement>e.target).id === "next-game") {
-                match.startGame();
-            }
+        document.getElementById("next-game").addEventListener("click", (e) => {
+            match.startGame();
         });
     }
 }
