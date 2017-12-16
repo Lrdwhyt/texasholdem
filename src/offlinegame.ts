@@ -310,14 +310,14 @@ class OfflineGame {
 
     isValidBet(player: Player, bet: Bet): boolean {
         switch (bet.type) {
-            case BetType.CALL:
+            case BetType.Call:
                 if (this.currentBet - this.bets[player.getName()] > 0 && player.getMoney() > 0) {
                     return true;
                 } else {
                     return false;
                 }
 
-            case BetType.RAISE:
+            case BetType.Raise:
                 let amountToCall: number = this.currentBet - this.bets[player.getName()];
                 if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + this.minRaise || bet.amount === player.getMoney())) {
                     return true;
@@ -325,14 +325,14 @@ class OfflineGame {
                     return false;
                 }
 
-            case BetType.CHECK:
+            case BetType.Check:
                 if (this.currentBet - this.bets[player.getName()] === 0) {
                     return true;
                 } else {
                     return false;
                 }
 
-            case BetType.FOLD:
+            case BetType.Fold:
                 return true;
 
             default:
@@ -358,7 +358,7 @@ class OfflineGame {
 
     processBet(player: Player, bet: Bet): void {
         switch (bet.type) {
-            case BetType.CALL:
+            case BetType.Call:
                 let toCallDifference = this.currentBet - this.bets[player.getName()];
                 if (player.getMoney() > toCallDifference) {
                     this.bets[player.getName()] += toCallDifference;
@@ -374,10 +374,10 @@ class OfflineGame {
                 }
                 break;
 
-            case BetType.CHECK:
+            case BetType.Check:
                 break;
 
-            case BetType.RAISE:
+            case BetType.Raise:
                 this.lastRaiser = player;
                 this.lastPlayer = this.getPrevPlayer(this.lastRaiser);
                 if (bet.amount - this.currentBet > this.minRaise) {
@@ -395,7 +395,7 @@ class OfflineGame {
                 this.modMoney(player, -bet.amount);
                 break;
 
-            case BetType.FOLD:
+            case BetType.Fold:
                 if (this.firstPlayer === player) {
                     this.firstPlayer = this.getNextPlayer(player);
                 }

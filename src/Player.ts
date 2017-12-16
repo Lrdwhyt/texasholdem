@@ -61,11 +61,11 @@ class UserController implements Controller {
     }
 
     placeBet(bet: Bet) {
-        if (bet.type === BetType.ALL_IN) {
+        if (bet.type === BetType.All_in) {
             if (this.player.getMoney() <= this.amountToCall) {
-                bet = new Bet(BetType.CALL);
+                bet = new Bet(BetType.Call);
             } else {
-                bet = new Bet(BetType.RAISE, this.player.getMoney());
+                bet = new Bet(BetType.Raise, this.player.getMoney());
             }
         }
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.minRaise)) {
@@ -112,22 +112,22 @@ class UserController implements Controller {
             let msg = "";
 
             switch (e.bet.type) {
-                case BetType.RAISE:
-                    msg = e.player.getName() + " raised to " + e.bet.amount;
+                case BetType.Raise:
+                    msg = e.player.getName() + " bet " + e.bet.amount;
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " bet $" + e.bet.amount;
                     break;
 
-                case BetType.CALL:
+                case BetType.Call:
                     msg = e.player.getName() + " called"
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " called";
                     break;
 
-                case BetType.CHECK:
+                case BetType.Check:
                     msg = e.player.getName() + " checked"
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " checked";
                     break;
 
-                case BetType.FOLD:
+                case BetType.Fold:
                     msg = e.player.getName() + " folded";
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " folded";
                     document.querySelector("[name=" + e.player.getName() + "]").className += " folded";
@@ -211,19 +211,19 @@ class UserView {
     init() {
         this.root.querySelector("#raise").addEventListener("click", () => {
             let amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
-            this.controller.placeBet(new Bet(BetType.RAISE, amount));
+            this.controller.placeBet(new Bet(BetType.Raise, amount));
         });
         this.root.querySelector("#call").addEventListener("click", () => {
-            this.controller.placeBet(new Bet(BetType.CALL));
+            this.controller.placeBet(new Bet(BetType.Call));
         });
         this.root.querySelector("#check").addEventListener("click", () => {
-            this.controller.placeBet(new Bet(BetType.CHECK));
+            this.controller.placeBet(new Bet(BetType.Check));
         });
         this.root.querySelector("#fold").addEventListener("click", () => {
-            this.controller.placeBet(new Bet(BetType.FOLD));
+            this.controller.placeBet(new Bet(BetType.Fold));
         });
         this.root.querySelector("#all-in").addEventListener("click", () => {
-            this.controller.placeBet(new Bet(BetType.ALL_IN));
+            this.controller.placeBet(new Bet(BetType.All_in));
         });
     }
 

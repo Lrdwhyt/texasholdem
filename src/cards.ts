@@ -1,20 +1,102 @@
 enum HandCombinations {
-    HIGH_CARD,
-    ONE_PAIR,
-    TWO_PAIR,
-    THREE_OF_A_KIND,
-    STRAIGHT,
-    FLUSH,
-    FULL_HOUSE,
-    FOUR_OF_A_KIND,
-    STRAIGHT_FLUSH
+    HighCard,
+    OnePair,
+    TwoPair,
+    ThreeOfAKind,
+    Straight,
+    Flush,
+    FullHouse,
+    FourOfAKind,
+    StraightFlush
 }
 
 enum Suit {
-    HEARTS,
-    CLUBS,
-    SPADES,
-    DIAMONDS
+    Spades = "S",
+    Hearts = "H",
+    Diamonds = "D",
+    Clubs = "C"
+}
+
+class Rank {
+    static Two = new Rank(2);
+    static Three = new Rank(3);
+    static Four = new Rank(4);
+    static Five = new Rank(5);
+    static Six = new Rank(6);
+    static Seven = new Rank(7);
+    static Eight = new Rank(8);
+    static Nine = new Rank(9);
+    static Ten = new Rank(10);
+    static Jack = new Rank(11);
+    static Queen = new Rank(12);
+    static King = new Rank(13);
+    static Ace = new Rank(1);
+
+    private val: number;
+
+    constructor(val) {
+        this.val = val;
+    }
+
+    public value(): number {
+        if (this.val === 1) {
+            return 13;
+        } else {
+            return this.val - 1;
+        }
+        
+    }
+
+    public valueAceLow(): number {
+        return this.val;
+    }
+
+    public toString(): string {
+        switch(this.val) {
+            case 1:
+                return "A";
+
+            case 13:
+                return "K";
+
+            case 12:
+                return "Q";
+
+            case 11:
+                return "J";
+
+            default:
+                return this.val.toString();
+        }
+    }
+}
+
+
+class Card {
+    public rank: Rank;
+    public suit: Suit;
+
+    constructor(rank: Rank, suit: Suit) {
+        this.rank = rank;
+        this.suit = suit;
+    }
+
+    equals(that): boolean {
+        return (this.rank === that.rank && this.suit === that.suit);
+    }
+
+    getImage(): HTMLElement {
+        let img = document.createElement("img");
+        img.src = "img/cards/" + this.rank.toString() + this.suit + ".png";
+        img.alt = this.toString();
+        img.className = "card";
+        return img;
+    }
+
+    toString(): string {
+        return this.rank.toString() + this.suit;
+    }
+
 }
 
 class Deck {
@@ -22,8 +104,8 @@ class Deck {
 
     constructor() {
         this.cards = [];
-        for (let suit of ["S", "H", "D", "C"]) {
-            for (let rank of [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]) {
+        for (let suit of [Suit.Spades, Suit.Hearts, Suit.Diamonds, Suit.Clubs]) {
+            for (let rank of [Rank.Two, Rank.Three, Rank.Four, Rank.Five, Rank.Six, Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace]) {
                 this.cards.push(new Card(rank, suit));
             }
         }
@@ -52,69 +134,6 @@ class Deck {
 
 }
 
-class Card {
-    public rank: string;
-    public suit: string;
-
-    constructor(rank, suit: string) {
-        this.rank = rank;
-        this.suit = suit;
-    }
-
-    equals(that): boolean {
-        return (this.rank == that.rank && this.suit == that.suit);
-    }
-
-    getImage(): HTMLElement {
-        let img = document.createElement("img");
-        img.src = "img/cards/" + this.rank + this.suit + ".png";
-        img.alt = this.toString();
-        img.className = "card";
-        return img;
-    }
-
-    toString(): string {
-        return this.rank + this.suit;
-    }
-
-    rankNumber(): number {
-        return {
-            2: 1,
-            3: 2,
-            4: 3,
-            5: 4,
-            6: 5,
-            7: 6,
-            8: 7,
-            9: 8,
-            10: 9,
-            "J": 10,
-            "Q": 11,
-            "K": 12,
-            "A": 13,
-        }[this.rank];
-    }
-
-    rankNumberAceLow(): number {
-        return {
-            "A": 1,
-            2: 2,
-            3: 3,
-            4: 4,
-            5: 5,
-            6: 6,
-            7: 7,
-            8: 8,
-            9: 9,
-            10: 10,
-            "J": 11,
-            "Q": 12,
-            "K": 13
-        }[this.rank];
-    }
-
-}
-
 var Hands = (function () {
 
     var difference = function (set, subset) {
@@ -129,11 +148,11 @@ var Hands = (function () {
         let results = cards.slice(0);
         if (isAceLow) {
             results.sort(function (a, b) {
-                return a.rankNumberAceLow() - b.rankNumberAceLow();
+                return a.rank.valueAceLow() - b.rank.valueAceLow();
             });
         } else {
             results.sort(function (a, b) {
-                return a.rankNumber() - b.rankNumber();
+                return a.rank.value() - b.rank.value();
             });
         }
         return results;
@@ -212,7 +231,7 @@ var Hands = (function () {
     var getScore = function (cards): number {
         let score: number = 0;
         for (let i = 0; i < cards.length; ++i) {
-            score += cards[i].rankNumber() * Math.pow(14, cards.length - i - 1);
+            score += cards[i].rank.value() * Math.pow(14, cards.length - i - 1);
         }
         return score;
     }
@@ -224,19 +243,19 @@ var Hands = (function () {
 
         for (let card of sorted) {
             if (currentRank === undefined || currentRank === null) {
-                currentRank = card.rankNumber();
+                currentRank = card.rank.value();
                 hand.push(card);
             } else {
-                if (card.rankNumber() === currentRank) {
+                if (card.rank.value() === currentRank) {
                     continue;
-                } else if (card.rankNumber() === currentRank + 1) {
-                    currentRank = card.rankNumber();
+                } else if (card.rank.value() === currentRank + 1) {
+                    currentRank = card.rank.value();
                     hand.push(card);
                 } else {
                     if (hand.length >= 5) {
                         return hand;
                     } else {
-                        currentRank = card.rankNumber();
+                        currentRank = card.rank.value();
                         hand = [card];
                     }
                 }
@@ -251,19 +270,19 @@ var Hands = (function () {
         currentRank = null;
         for (let card of sorted) {
             if (currentRank === undefined || currentRank === null) {
-                currentRank = card.rankNumberAceLow();
+                currentRank = card.rank.valueAceLow();
                 hand.push(card);
             } else {
-                if (card.rankNumberAceLow() === currentRank) {
+                if (card.rank.valueAceLow() === currentRank) {
                     continue;
-                } else if (card.rankNumberAceLow() === currentRank + 1) {
-                    currentRank = card.rankNumberAceLow();
+                } else if (card.rank.valueAceLow() === currentRank + 1) {
+                    currentRank = card.rank.valueAceLow();
                     hand.push(card);
                 } else {
                     if (hand.length >= 5) {
                         return hand;
                     } else {
-                        currentRank = card.rankNumberAceLow();
+                        currentRank = card.rank.valueAceLow();
                         hand = [card];
                     }
                 }
@@ -294,15 +313,15 @@ var Hands = (function () {
                 if (highestCard.rank === "A" && secondHighestCard.rank != "K") {
                     ls = sort(ls, true);
                     hand = ls.slice(-5);
-                    score = 8 * Math.pow(14, 5) + secondHighestCard.rankNumber();
+                    score = 8 * Math.pow(14, 5) + secondHighestCard.rank.value();
                 } else {
                     hand = getNHighestCards(ls, 5);
-                    score = 8 * Math.pow(14, 5) + highestCard.rankNumber();
+                    score = 8 * Math.pow(14, 5) + highestCard.rank.value();
                 }
                 return {
                     hand: hand,
                     score: score,
-                    type: HandCombinations.STRAIGHT_FLUSH
+                    type: HandCombinations.StraightFlush
                 };
             }
         }
@@ -311,26 +330,26 @@ var Hands = (function () {
             let quad = mostCommonRanks[0];
             let kicker = getNHighestCards(difference(cards, quad), 1);
             hand = quad.concat(kicker);
-            score = 7 * Math.pow(14, 5) + quad[0].rankNumber() * 14 + kicker[0].rankNumber();
+            score = 7 * Math.pow(14, 5) + quad[0].rank.value() * 14 + kicker[0].rank.value();
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.FOUR_OF_A_KIND
+                type: HandCombinations.FourOfAKind
             };
         } else if (mostCommonRanks[0].length === 3 && mostCommonRanks[1].length >= 2) { // Full house
             let triple = mostCommonRanks[0];
             let pair;
-            if (mostCommonRanks[2].length === 2 && mostCommonRanks[2][0].rankNumber() > mostCommonRanks[1][0].rankNumber()) {
+            if (mostCommonRanks[2].length === 2 && mostCommonRanks[2][0].rank.value() > mostCommonRanks[1][0].rank.value()) {
                 pair = mostCommonRanks[2];
             } else {
                 pair = mostCommonRanks[1].slice(0, 2);
             }
             hand = triple.concat(pair);
-            score = 6 * Math.pow(14, 5) + triple[0].rankNumber() * 14 + pair[0].rankNumber();
+            score = 6 * Math.pow(14, 5) + triple[0].rank.value() * 14 + pair[0].rank.value();
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.FULL_HOUSE
+                type: HandCombinations.FullHouse
             };
         } else if (largestSuit.length >= 5) { // Flush
             hand = getNHighestCards(largestSuit, 5);
@@ -338,7 +357,7 @@ var Hands = (function () {
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.FLUSH
+                type: HandCombinations.Flush
             };
         } else if (longestStraight.length >= 5) { // Straight
             let highestCard = getHighestCard(longestStraight);
@@ -346,32 +365,32 @@ var Hands = (function () {
             if (highestCard.rank === "A" && secondHighestCard.rank != "K") {
                 longestStraight = sort(longestStraight, true);
                 hand = longestStraight.slice(-5);
-                score = 4 * Math.pow(14, 5) + secondHighestCard.rankNumber();
+                score = 4 * Math.pow(14, 5) + secondHighestCard.rank.value();
             } else {
                 hand = getNHighestCards(longestStraight, 5);
-                score = 4 * Math.pow(14, 5) + highestCard.rankNumber();
+                score = 4 * Math.pow(14, 5) + highestCard.rank.value();
             }
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.STRAIGHT
+                type: HandCombinations.Straight
             };
         } else if (mostCommonRanks[0].length === 3) { // Three of a kind
             let triple = mostCommonRanks[0];
             let kickers = getNHighestCards(difference(cards, triple), 2);
             hand = triple.concat(kickers);
-            score = 3 * Math.pow(14, 5) + triple[0].rankNumber() * Math.pow(14, 3) + getScore(kickers);
+            score = 3 * Math.pow(14, 5) + triple[0].rank.value() * Math.pow(14, 3) + getScore(kickers);
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.THREE_OF_A_KIND
+                type: HandCombinations.ThreeOfAKind
             };
         } else if (mostCommonRanks[0].length === 2 && mostCommonRanks[1].length === 2) { // Two pair
             let highPair;
             let lowPair;
             if (mostCommonRanks[2].length === 2) {
                 // Check which 2 pairs are highest
-                if (mostCommonRanks[2][0].rankNumber() > mostCommonRanks[1][0].rankNumber()) {
+                if (mostCommonRanks[2][0].rank.value() > mostCommonRanks[1][0].rank.value()) {
                     highPair = mostCommonRanks[2];
                 }
                 lowPair = mostCommonRanks[1];
@@ -383,21 +402,21 @@ var Hands = (function () {
             let remainder = difference(cards, hand);
             let kicker = getHighestCard(remainder)
             hand.push(kicker);
-            score = 2 * Math.pow(14, 5) + highPair[0].rankNumber() * Math.pow(14, 2) + lowPair[0].rankNumber() * Math.pow(14, 1) + kicker.rankNumber();
+            score = 2 * Math.pow(14, 5) + highPair[0].rank.value() * Math.pow(14, 2) + lowPair[0].rank.value() * Math.pow(14, 1) + kicker.rank.value();
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.TWO_PAIR
+                type: HandCombinations.TwoPair
             };
         } else if (mostCommonRanks[0].length === 2) { // One pair
             let pair = mostCommonRanks[0];
             let kickers = getNHighestCards(difference(cards, pair), 3);
             hand = pair.concat(kickers);
-            score = Math.pow(14, 5) + pair[0].rankNumber() * Math.pow(14, 3) + getScore(kickers);
+            score = Math.pow(14, 5) + pair[0].rank.value() * Math.pow(14, 3) + getScore(kickers);
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.ONE_PAIR
+                type: HandCombinations.OnePair
             };
         } else { // High card
             hand = getNHighestCards(cards, 5);
@@ -405,7 +424,7 @@ var Hands = (function () {
             return {
                 hand: hand,
                 score: score,
-                type: HandCombinations.HIGH_CARD
+                type: HandCombinations.HighCard
             };
         }
 

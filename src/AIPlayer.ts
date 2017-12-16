@@ -63,35 +63,35 @@ class AIController implements Controller {
 
         if (lossRatio === 0) {
             if (money > toCall) {
-                return new Bet(BetType.RAISE, money);
+                return new Bet(BetType.Raise, money);
             } else {
-                return new Bet(BetType.CALL);
+                return new Bet(BetType.Call);
             }
         }
 
         if (toCall === 0) {
             if (winRatio <= 0.5) {
-                return new Bet(BetType.CHECK);
+                return new Bet(BetType.Check);
             } else {
                 if (money >= toRaise) {
                     let raise = toRaise * 8;
                     while (raise >= toRaise) {
                         if (money >= raise * 2 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
-                            return new Bet(BetType.RAISE, raise);
+                            return new Bet(BetType.Raise, raise);
                         }
                         raise /= 2;
                     }
-                    return new Bet(BetType.RAISE, toRaise);
+                    return new Bet(BetType.Raise, toRaise);
                 } else {
-                    return new Bet(BetType.CHECK);
+                    return new Bet(BetType.Check);
                 }
             }
         } else {
             if (winRatio <= 0.5) {
                 if (potOdds * 2 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else if (winRatio <= 0.8) {
                 if (potOdds * 2 <= winRatio) {
@@ -99,16 +99,16 @@ class AIController implements Controller {
                         let raise = toRaise * 8;
                         while (raise >= toRaise) {
                             if (money >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
-                                return new Bet(BetType.RAISE, raise);
+                                return new Bet(BetType.Raise, raise);
                             }
                             raise /= 2;
                         }
-                        return new Bet(BetType.RAISE, toRaise);
+                        return new Bet(BetType.Raise, toRaise);
                     } else {
-                        return new Bet(BetType.CALL);
+                        return new Bet(BetType.Call);
                     }
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else {
                 if (potOdds * 2 <= winRatio) {
@@ -116,16 +116,16 @@ class AIController implements Controller {
                         let raise = toRaise * 16;
                         while (raise >= toRaise) {
                             if (money >= raise && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
-                                return new Bet(BetType.RAISE, raise);
+                                return new Bet(BetType.Raise, raise);
                             }
                             raise /= 2;
                         }
-                        return new Bet(BetType.RAISE, toRaise);
+                        return new Bet(BetType.Raise, toRaise);
                     } else {
-                        return new Bet(BetType.CALL);
+                        return new Bet(BetType.Call);
                     }
                 } else {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 }
             }
         }
@@ -175,41 +175,41 @@ class AIController implements Controller {
 
         if (lossRatio === 0) {
             if (money > toCall) {
-                return new Bet(BetType.RAISE, money);
+                return new Bet(BetType.Raise, money);
             } else {
-                return new Bet(BetType.CALL);
+                return new Bet(BetType.Call);
             }
         }
 
         if (toCall === 0) {
             if (winRatio <= 0.5) {
-                return new Bet(BetType.CHECK);
+                return new Bet(BetType.Check);
             } else {
                 if (money >= toRaise) {
                     let raise = toRaise * 8;
                     while (raise >= toRaise) {
                         if (money >= raise * 3 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
-                            return new Bet(BetType.RAISE, raise);
+                            return new Bet(BetType.Raise, raise);
                         }
                         raise /= 2;
                     }
-                    return new Bet(BetType.RAISE, toRaise);
+                    return new Bet(BetType.Raise, toRaise);
                 } else {
-                    return new Bet(BetType.CHECK);
+                    return new Bet(BetType.Check);
                 }
             }
         } else {
             if (winRatio <= 0.5) {
                 if (potOdds * 1.5 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else if (winRatio <= 0.8) {
                 if (potOdds * 2 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else {
                 if (potOdds * 2 <= winRatio) {
@@ -217,16 +217,16 @@ class AIController implements Controller {
                         let raise = toRaise * 8;
                         while (raise >= toRaise) {
                             if (money >= raise && raise / potCheck(this.player, raise) * 2 <= winRatio) {
-                                return new Bet(BetType.RAISE, raise);
+                                return new Bet(BetType.Raise, raise);
                             }
                             raise /= 2;
                         }
-                        return new Bet(BetType.RAISE, toRaise);
+                        return new Bet(BetType.Raise, toRaise);
                     } else {
-                        return new Bet(BetType.CALL);
+                        return new Bet(BetType.Call);
                     }
                 } else {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 }
             }
         }
@@ -276,41 +276,41 @@ class AIController implements Controller {
 
         if (winRatio === 1) {
             if (money > toCall) {
-                return new Bet(BetType.RAISE, money);
+                return new Bet(BetType.Raise, money);
             } else {
-                return new Bet(BetType.CALL);
+                return new Bet(BetType.Call);
             }
         }
 
         if (toCall === 0) {
             if (winRatio <= 0.6) {
-                return new Bet(BetType.CHECK);
+                return new Bet(BetType.Check);
             } else {
                 if (money >= toRaise) {
                     let raise = toRaise * 4;
                     while (raise >= toRaise) {
                         if (money >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
-                            return new Bet(BetType.RAISE, raise);
+                            return new Bet(BetType.Raise, raise);
                         }
                         raise /= 2;
                     }
-                    return new Bet(BetType.RAISE, toRaise);
+                    return new Bet(BetType.Raise, toRaise);
                 } else {
-                    return new Bet(BetType.CHECK);
+                    return new Bet(BetType.Check);
                 }
             }
         } else {
             if (winRatio <= 0.5) {
                 if (potOdds * 3 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else if (winRatio <= 0.8) {
                 if (potOdds * 2.5 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else {
                 if (potOdds * 2 <= winRatio) {
@@ -318,16 +318,16 @@ class AIController implements Controller {
                         let raise = toRaise * 8;
                         while (raise >= toRaise) {
                             if (money >= raise * 2 && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
-                                return new Bet(BetType.RAISE, raise);
+                                return new Bet(BetType.Raise, raise);
                             }
                             raise /= 2;
                         }
-                        return new Bet(BetType.RAISE, toRaise);
+                        return new Bet(BetType.Raise, toRaise);
                     } else {
-                        return new Bet(BetType.CALL);
+                        return new Bet(BetType.Call);
                     }
                 } else {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 }
             }
         }
@@ -377,41 +377,41 @@ class AIController implements Controller {
 
         if (winRatio === 1) {
             if (money > toCall) {
-                return new Bet(BetType.RAISE, money);
+                return new Bet(BetType.Raise, money);
             } else {
-                return new Bet(BetType.CALL);
+                return new Bet(BetType.Call);
             }
         }
 
         if (toCall === 0) {
             if (winRatio <= 0.7) {
-                return new Bet(BetType.CHECK);
+                return new Bet(BetType.Check);
             } else {
                 if (money >= toRaise) {
                     let raise = toRaise * 4;
                     while (raise >= toRaise) {
                         if (money >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
-                            return new Bet(BetType.RAISE, raise);
+                            return new Bet(BetType.Raise, raise);
                         }
                         raise /= 2;
                     }
-                    return new Bet(BetType.RAISE, toRaise);
+                    return new Bet(BetType.Raise, toRaise);
                 } else {
-                    return new Bet(BetType.CHECK);
+                    return new Bet(BetType.Check);
                 }
             }
         } else {
             if (winRatio <= 0.5) {
                 if (potOdds * 3 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else if (winRatio <= 0.8) {
                 if (potOdds * 3 <= winRatio) {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 } else {
-                    return new Bet(BetType.FOLD);
+                    return new Bet(BetType.Fold);
                 }
             } else {
                 if (potOdds * 2.5 <= winRatio) {
@@ -419,16 +419,16 @@ class AIController implements Controller {
                         let raise = toRaise * 8;
                         while (raise >= toRaise) {
                             if (money >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
-                                return new Bet(BetType.RAISE, raise);
+                                return new Bet(BetType.Raise, raise);
                             }
                             raise /= 2;
                         }
-                        return new Bet(BetType.RAISE, toRaise);
+                        return new Bet(BetType.Raise, toRaise);
                     } else {
-                        return new Bet(BetType.CALL);
+                        return new Bet(BetType.Call);
                     }
                 } else {
-                    return new Bet(BetType.CALL);
+                    return new Bet(BetType.Call);
                 }
             }
         }

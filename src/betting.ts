@@ -1,9 +1,9 @@
 enum BetType {
-    FOLD,
-    CHECK,
-    CALL,
-    RAISE,
-    ALL_IN
+    Fold,
+    Check,
+    Call,
+    Raise,
+    All_in
 };
 
 class Bet {
@@ -54,28 +54,28 @@ class Pot {
 class Betting {
     static isValidBet(player: Player, bet: Bet, amountToCall: number, minRaise: number): boolean {
         switch (bet.type) {
-            case BetType.CALL:
+            case BetType.Call:
                 if (amountToCall > 0 && player.getMoney() > 0) {
                     return true;
                 } else {
                     return false;
                 }
 
-            case BetType.RAISE:
+            case BetType.Raise:
                 if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || bet.amount === player.getMoney())) {
                     return true;
                 } else {
                     return false;
                 }
 
-            case BetType.CHECK:
+            case BetType.Check:
                 if (amountToCall === 0) {
                     return true;
                 } else {
                     return false;
                 }
 
-            case BetType.FOLD:
+            case BetType.Fold:
                 return true;
 
             default:
