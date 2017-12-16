@@ -10,6 +10,13 @@ enum HandCombinations {
     STRAIGHT_FLUSH
 }
 
+enum Suit {
+    HEARTS,
+    CLUBS,
+    SPADES,
+    DIAMONDS
+}
+
 class Deck {
     private cards: Card[];
 
@@ -60,7 +67,7 @@ class Card {
 
     getImage(): HTMLElement {
         let img = document.createElement("img");
-        img.src = "cards-svg/" + this.rank + this.suit + ".png";
+        img.src = "img/cards/" + this.rank + this.suit + ".png";
         img.alt = this.toString();
         img.className = "card";
         return img;
