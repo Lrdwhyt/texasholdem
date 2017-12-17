@@ -28,7 +28,7 @@ class AIController implements Controller {
         let totalWins: number = 0;
         let totalDraws: number = 0;
 
-        let trials: number = 100;
+        let trials: number = 50;
 
         for (let i = 0; i < trials; ++i) {
             deck.shuffle();
@@ -39,16 +39,21 @@ class AIController implements Controller {
             }
 
             let possibleCards: Card[] = cards.concat(possibleBoard);
+            let bestScore = 0;
+            console.log(this.unfoldedPlayers.length);
+            for (let j = 0; j < this.unfoldedPlayers.length; ++j) {
+                let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
+                // TODO: make X hypothetical hands for X-1 players
 
-            let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
-            // TODO: make X hypothetical hands for X-1 players
-
-            let hypotheticalResult = Hands.bestHand(hypotheticalHand.concat(possibleBoard));
+                let hypotheticalResult = Hands.bestHand(hypotheticalHand.concat(possibleBoard));
+                if (hypotheticalResult.score > bestScore) {
+                    bestScore = hypotheticalResult.score;
+                }
+            }
             let bestHand = Hands.bestHand(possibleCards);
-
-            if (bestHand.score > hypotheticalResult.score) {
+            if (bestHand.score > bestScore) {
                 ++totalWins;
-            } else if (bestHand.score === hypotheticalResult.score) {
+            } else if (bestHand.score === bestScore) {
                 ++totalDraws;
             } else {
                 ++totalLosses;
@@ -65,6 +70,7 @@ class AIController implements Controller {
         }
 
         let potOdds = amountToCall / potCheck(this.player, amountToCall);
+        console.log("Pot odds: " + potOdds + ", win ratio: " + winRatio);
 
         if (winRatio === 1) {
             if (money > amountToCall) {
@@ -101,7 +107,7 @@ class AIController implements Controller {
                             return new Bet(BetType.Fold);
                         }
                     } else if (winRatio <= 0.8) {
-                        if (potOdds * 2 <= winRatio) {
+                        if (potOdds * 1.5 <= winRatio) {
                             if (money >= amountToRaise) {
                                 let raise = amountToRaise * 8;
                                 while (raise >= amountToRaise) {
@@ -118,7 +124,7 @@ class AIController implements Controller {
                             return new Bet(BetType.Fold);
                         }
                     } else {
-                        if (potOdds * 2 <= winRatio) {
+                        if (potOdds * 1.5 <= winRatio) {
                             if (money >= amountToRaise) {
                                 let raise = amountToRaise * 16;
                                 while (raise >= amountToRaise) {
@@ -157,13 +163,13 @@ class AIController implements Controller {
                     }
                 } else {
                     if (winRatio <= 0.5) {
-                        if (potOdds * 3 <= winRatio) {
+                        if (potOdds * 2 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
                         }
                     } else if (winRatio <= 0.8) {
-                        if (potOdds * 2.5 <= winRatio) {
+                        if (potOdds * 2 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
@@ -208,13 +214,13 @@ class AIController implements Controller {
                     }
                 } else {
                     if (winRatio <= 0.5) {
-                        if (potOdds * 3 <= winRatio) {
+                        if (potOdds * 2.5 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
                         }
                     } else if (winRatio <= 0.8) {
-                        if (potOdds * 3 <= winRatio) {
+                        if (potOdds * 2.5 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
@@ -298,7 +304,7 @@ class AIController implements Controller {
     dispatchEvent(e: GameEvent): void {
         if (e instanceof GameStartEvent) {
             this.board = [];
-            this.unfoldedPlayers = e.players;
+            this.unfoldedPlayers = e.players.slice(0);
             this.unfoldedPlayers.splice(this.unfoldedPlayers.indexOf(this.player), 1);
         } else if (e instanceof DealtHandEvent) {
             this.hand = e.hand;
