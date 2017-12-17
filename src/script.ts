@@ -91,7 +91,7 @@
         activeMatches.send();
     }
 
-    var joinTable = function (id) {
+    var joinTable = function (id: number) {
         let connection = new WebSocket("ws://" + location.host + "/tables/match/" + id);
     }
 

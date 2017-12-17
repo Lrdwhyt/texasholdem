@@ -21,9 +21,9 @@ class PlayerMoneyChangeEvent implements GameEvent {
 }
 
 class PotChangeEvent implements GameEvent {
-    public pots;
+    public pots: Pot[];
 
-    constructor(pots) {
+    constructor(pots: Pot[]) {
         this.pots = pots;
     }
 }
@@ -90,9 +90,9 @@ class DealtRiverEvent implements GameEvent {
 
 class GameEndEvent implements GameEvent {
     public result;
-    public moneyChange;
+    public moneyChange: { [name: string]: number };
 
-    constructor(result, moneyChange) {
+    constructor(result, moneyChange: { [name: string]: number }) {
         this.result = result;
         this.moneyChange = moneyChange;
     }

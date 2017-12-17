@@ -208,7 +208,7 @@ class UserView {
         this.init();
     }
 
-    init() {
+    init(): void {
         this.root.querySelector("#raise").addEventListener("click", () => {
             let amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
             this.controller.placeBet(new Bet(BetType.Raise, amount));
@@ -227,7 +227,7 @@ class UserView {
         });
     }
 
-    disableBetting() {
+    disableBetting(): void {
         (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
         (<HTMLButtonElement>document.getElementById("call")).disabled = true;
         (<HTMLButtonElement>document.getElementById("all-in")).disabled = true;
@@ -239,7 +239,7 @@ class UserView {
         alert("Invalid bet!");
     }
 
-    resetUI() {
+    resetUI(): void {
         document.getElementById("user-info").innerHTML = "";
         document.getElementById("user-cards").innerHTML = "";
         document.getElementById("board").innerHTML = "";
@@ -252,14 +252,14 @@ class UserView {
         };
     }
 
-    resetBetting() {
+    resetBetting(): void {
         let texts = document.querySelectorAll(".text")
         for (let i = 0; i < texts.length; ++i) {
             texts[i].innerHTML = "";
         };
     }
 
-    drawPlayer(player: Player) {
+    drawPlayer(player: Player): HTMLDivElement {
         let playerRoot = document.createElement("div");
         playerRoot.setAttribute("name", player.getName());
         playerRoot.className = "player";
@@ -284,7 +284,7 @@ class UserView {
         return playerRoot;
     }
 
-    drawUser(player: Player) {
+    drawUser(player: Player): void {
         let playerRoot = document.createElement("div");
         playerRoot.setAttribute("name", player.getName());
         playerRoot.className = "player";
@@ -307,87 +307,92 @@ class UserView {
         document.getElementById("user-info").appendChild(playerRoot);
     }
 
-    drawBoard(players: Player[]) {
+    drawBoard(players: Player[]): void {
         let otherPlayers = players.slice(0);
+        let leftColumn: HTMLElement = document.getElementById("players-left");
+        let centerColumn: HTMLElement = document.getElementById("players-top");
+        let rightColumn: HTMLElement = document.getElementById("players-right");
+
         switch (otherPlayers.length) {
             case 1:
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[0]));
                 break;
 
             case 2:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[1]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[1]));
                 break;
 
             case 3:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[2]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[2]));
                 break;
 
             case 4:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[2]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[3]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[2]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[3]));
                 break;
 
             case 5:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[2]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[3]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[4]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[2]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[3]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[4]));
                 break;
 
             case 6:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[2]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[3]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[4]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[5]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[2]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[3]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[4]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[5]));
                 break;
 
             case 7:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[2]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[3]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[4]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[5]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[6]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[2]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[3]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[4]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[5]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[6]));
                 break;
 
             case 8:
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[2]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[1]));
-                document.getElementById("players-left").appendChild(this.drawPlayer(otherPlayers[0]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[3]));
-                document.getElementById("players-top").appendChild(this.drawPlayer(otherPlayers[4]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[5]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[6]));
-                document.getElementById("players-right").appendChild(this.drawPlayer(otherPlayers[7]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[2]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[1]));
+                leftColumn.appendChild(this.drawPlayer(otherPlayers[0]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[3]));
+                centerColumn.appendChild(this.drawPlayer(otherPlayers[4]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[5]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[6]));
+                rightColumn.appendChild(this.drawPlayer(otherPlayers[7]));
                 break;
         }
     }
 
-    updatePot(pots) {
+    updatePot(pots: Pot[]): void {
+        let potElement: HTMLElement | null = document.getElementById("pots");
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot
-            document.getElementById("pots").textContent = "Pot: $" + pots[0].size();
+            potElement.textContent = "Pot: $" + pots[0].size();
         } else {
             for (let index in pots) {
                 if (index === "0") {
-                    document.getElementById("pots").textContent = "Main pot: $" + pots[index].size();
+                    potElement.textContent = "Main pot: $" + pots[index].size();
                 } else if (pots[index].players.length > 1) {
-                    document.getElementById("pots").textContent += ", side pot " + index + ": $" + pots[index].size();
+                    potElement.textContent += ", side pot " + index + ": $" + pots[index].size();
                 }
             }
         }
     }
 
-    restrictToValid(current, committed, minRaise, money) {
-        (<HTMLInputElement>document.getElementById("bet")).value = current - committed + minRaise;
+    restrictToValid(current: number, committed: number, minRaise: number, money: number): void {
+        (<HTMLInputElement>document.getElementById("bet")).value = String(current - committed + minRaise);
         (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
         (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
 

@@ -124,7 +124,6 @@ class OfflineGame {
 
         this.lastPlayerFlag = false;
 
-
         this.bettingStage = BettingStage.NONE;
 
         this.button = button;
@@ -243,7 +242,7 @@ class OfflineGame {
         this.updatePots(); // Redistribute pots
     }
 
-    processPot(pot): any {
+    processPot(pot: Pot) {
         if (pot.players.length === 1) { // Only one player eligible for pot, who automatically wins it.
             this.modMoney(pot.players[0], pot.size());
             return {

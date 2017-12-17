@@ -34,7 +34,7 @@ class Rank {
     static King = new Rank(13);
     static Ace = new Rank(1);
 
-    private val: number;
+    private readonly val: number;
 
     constructor(val: number) {
         this.val = val;
@@ -74,15 +74,15 @@ class Rank {
 }
 
 class Card {
-    public rank: Rank;
-    public suit: Suit;
+    public readonly rank: Rank;
+    public readonly suit: Suit;
 
     constructor(rank: Rank, suit: Suit) {
         this.rank = rank;
         this.suit = suit;
     }
 
-    equals(that): boolean {
+    equals(that: Card): boolean {
         return (this.rank === that.rank && this.suit === that.suit);
     }
 
@@ -391,9 +391,7 @@ class Hands {
             let lowPair;
             if (mostCommonRanks[2].length === 2) {
                 // Check which 2 pairs are highest
-                if (mostCommonRanks[2][0].rank.value() > mostCommonRanks[1][0].rank.value()) {
-                    highPair = mostCommonRanks[2];
-                }
+                highPair = mostCommonRanks[2];
                 lowPair = mostCommonRanks[1];
             } else {
                 highPair = mostCommonRanks[1];
