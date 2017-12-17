@@ -115,9 +115,9 @@ class Deck {
     shuffle(): void {
         for (let i = this.cards.length - 1; i > 0; --i) {
             let j = Math.floor(Math.random() * (i + 1));
-            let ele = this.cards[i];
+            let temp = this.cards[i];
             this.cards[i] = this.cards[j];
-            this.cards[j] = ele;
+            this.cards[j] = temp;
         }
     };
 
@@ -146,8 +146,8 @@ class Hands {
     }
 
     static sort(cards: Card[], isAceLow?: boolean): Card[] {
-        let results = cards.slice(0);
-        if (isAceLow) {
+        let results: Card[] = cards.slice(0);
+        if (isAceLow === true) {
             results.sort(function (a, b) {
                 return a.rank.valueAceLow() - b.rank.valueAceLow();
             });
@@ -157,19 +157,6 @@ class Hands {
             });
         }
         return results;
-    }
-
-    static getHighestCard(cards: Card[]): Card {
-        return this.sort(cards)[cards.length - 1];
-    }
-
-    static getNHighestCards(cards: Card[], n: number): Card[] {
-        let sorted = this.sort(cards);
-        let result = [];
-        while (result.length < n) {
-            result.push(sorted.pop());
-        }
-        return result;
     }
 
     static sortBySuit(cards: Card[]): Card[] {
@@ -184,7 +171,20 @@ class Hands {
         return results;
     }
 
-    static groupByRank(cards) {
+    static getHighestCard(cards: Card[]): Card {
+        return this.sort(cards)[cards.length - 1];
+    }
+
+    static getNHighestCards(cards: Card[], n: number): Card[] {
+        let sorted: Card[] = this.sort(cards);
+        let result: Card[] = [];
+        while (result.length < n) {
+            result.push(sorted.pop());
+        }
+        return result;
+    }
+
+    static groupByRank(cards: Card[]) {
         let results = [];
         let sorted = this.sort(cards);
         let currentIndex: number = 0;
@@ -206,7 +206,7 @@ class Hands {
         return results;
     }
 
-    static groupBySuit(cards) {
+    static groupBySuit(cards: Card[]) {
         let results = [];
         cards = this.sortBySuit(cards);
         let currentIndex: number = 0;
@@ -237,10 +237,10 @@ class Hands {
         return score;
     }
 
-    static longestSequence(cards: Card[]) { //longest sequence of cards (including A low/high) with 5+ cards
-        let sorted = this.sort(cards);
-        let hand = [];
-        let currentRank;
+    static longestSequence(cards: Card[]): Card[] { //longest sequence of cards (including A low/high) with 5+ cards
+        let sorted: Card[] = this.sort(cards);
+        let hand: Card[] = [];
+        let currentRank: number;
 
         for (let card of sorted) {
             if (currentRank === undefined || currentRank === null) {
@@ -297,7 +297,7 @@ class Hands {
         }
     }
 
-    public static bestHand(cards) {
+    public static bestHand(cards: Card[]) {
         let hand: Card[] = [];
         let score: number;
 
@@ -309,8 +309,8 @@ class Hands {
         if (largestSuit.length >= 5) { // Straight flush
             let ls = this.longestSequence(mostCommonSuits[0]);
             if (ls.length >= 5) {
-                let highestCard = this.getHighestCard(ls);
-                let secondHighestCard = this.getHighestCard(this.difference(ls, [highestCard]));
+                let highestCard: Card = this.getHighestCard(ls);
+                let secondHighestCard: Card = this.getHighestCard(this.difference(ls, [highestCard]));
                 if (highestCard.rank === Rank.Ace && secondHighestCard.rank !== Rank.King) {
                     ls = this.sort(ls, true);
                     hand = ls.slice(-5);

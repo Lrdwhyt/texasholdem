@@ -21,13 +21,13 @@ class AIController implements Controller {
 
     betAggressive(cards, board, currentBet, committed, minRaise, money, potCheck) {
 
-        let deck = new Deck();
+        let deck: Deck = new Deck();
 
-        let totalLosses = 0;
-        let totalWins = 0;
-        let totalDraws = 0;
+        let totalLosses: number = 0;
+        let totalWins: number = 0;
+        let totalDraws: number = 0;
 
-        let trials = 30;
+        let trials: number = 30;
 
         for (let i = 0; i < trials; ++i) {
             deck.shuffle();
@@ -37,12 +37,13 @@ class AIController implements Controller {
                 possibleBoard.push(possibleDraws.pop());
             }
 
-            let possibleHand = cards.concat(possibleBoard);
+            let possibleCards = cards.concat(possibleBoard);
 
             let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
+            // TODO: make X hypothetical hands for X-1 players
 
             let hypotheticalResult = Hands.bestHand(hypotheticalHand.concat(possibleBoard));
-            let bestHand = Hands.bestHand(possibleHand);
+            let bestHand = Hands.bestHand(possibleCards);
 
             if (bestHand.score > hypotheticalResult.score) {
                 ++totalWins;
@@ -446,7 +447,7 @@ class AIController implements Controller {
 
             if (e.player === this.player) {
 
-                let bet = null;
+                let bet: Bet;
 
                 switch (this.strategy) {
                     case Strategy.NORMAL:
