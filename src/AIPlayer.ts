@@ -40,7 +40,6 @@ class AIController implements Controller {
 
             let possibleCards: Card[] = cards.concat(possibleBoard);
             let bestScore = 0;
-            console.log(this.unfoldedPlayers.length);
             for (let j = 0; j < this.unfoldedPlayers.length; ++j) {
                 let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
                 // TODO: make X hypothetical hands for X-1 players

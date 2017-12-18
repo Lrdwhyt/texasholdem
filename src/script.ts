@@ -1,6 +1,9 @@
+class AppController {
+
+}
+
 (function () {
     var startMatch = function () {
-
 
         document.getElementById("container").innerHTML = `<div id="players">
             <div id="players-left"></div>
@@ -38,43 +41,46 @@
             </div>
             <div id="players-right"></div>`;
 
-        var m = new OfflineMatch();
-        var mc = new MatchController(m);
+        let m = new OfflineMatch();
+        let k = document.getElementById("next-game").cloneNode(true);
+        document.getElementById("next-game").parentNode.replaceChild(k, document.getElementById("next-game"));
+        document.getElementById("next-game").addEventListener("click", (e) => {
+            m.startGame();
+        });
 
-
-        var p1 = new Player("Human", 3000);
+        let p1 = new Player("Human", 3000);
         p1.setController(new UserController(p1, document.getElementById("user")));
         m.addPlayer(p1);
 
-        var p2 = new Player("Aardvark", 12125);
+        let p2 = new Player("Aardvark", 12125);
         p2.setController(new AIController(p2, Strategy.Normal));
         m.addPlayer(p2);
 
-        var p3 = new Player("Coyote", 12125);
+        let p3 = new Player("Coyote", 12125);
         p3.setController(new AIController(p3, Strategy.Aggressive));
         m.addPlayer(p3);
 
-        var p4 = new Player("Elephant", 12125);
+        let p4 = new Player("Elephant", 12125);
         p4.setController(new AIController(p4, Strategy.Passive));
         m.addPlayer(p4);
 
-        var p5 = new Player("Kangaroo", 12125);
+        let p5 = new Player("Kangaroo", 12125);
         p5.setController(new AIController(p5, Strategy.Tricky));
         m.addPlayer(p5);
 
-        var p6 = new Player("Leopard", 12125);
+        let p6 = new Player("Leopard", 12125);
         p6.setController(new AIController(p6, Strategy.Aggressive));
         m.addPlayer(p6);
 
-        var p7 = new Player("Panda", 12125);
+        let p7 = new Player("Panda", 12125);
         p7.setController(new AIController(p7, Strategy.Passive));
         m.addPlayer(p7);
 
-        var p8 = new Player("Squirrel", 12125);
+        let p8 = new Player("Squirrel", 12125);
         p8.setController(new AIController(p8, Strategy.Tricky));
         m.addPlayer(p8);
 
-        var p9 = new Player("Zebra", 12125);
+        let p9 = new Player("Zebra", 12125);
         p9.setController(new AIController(p9, Strategy.Normal));
         m.addPlayer(p9);
 
@@ -136,12 +142,6 @@
 
     window.onload = function () {
         startMatch();
-        document.getElementById("play-online").addEventListener("click", function () {
-            startOnlineMatch();
-        });
-        document.getElementById("play-offline").addEventListener("click", function () {
-            startMatch();
-        });
         document.getElementById("next-match").addEventListener("click", function () {
             startMatch();
         });

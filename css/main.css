@@ -1,0 +1,221 @@
+html, body {
+    color: #fff;
+    margin: 0;
+}
+
+#primary-nav {
+    background: #234;
+    height: 2em;
+}
+
+#secondary-nav {
+    background: #345;
+    height: 2em;
+}
+
+#primary-nav a {
+    display: inline-block;
+    color: inherit;
+    height: 100%;
+    text-decoration: none;
+    padding: 0 10px;
+}
+
+#primary-nav a:hover {
+    opacity: 0.7;
+}
+
+#secondary-nav div {
+    display: inline-block;
+}
+
+#container {
+    background: #456;
+    min-height: 600px;
+    min-width: 1080px;
+    padding-top: 10px;
+    height: calc(100vh - 4em - 10px);
+}
+
+#players {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+#players-left, #players-right {
+    align-items: center;
+    display: inline-flex;
+    flex: 1 1 25%;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+#players-top {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+}
+
+#board .card {
+    margin: 0 5px;
+}
+
+#board {
+    border: 2px solid #678;
+    border-radius: 3px;
+    margin: 0 auto;
+    height: 174px;
+    padding: 5px 0;
+    text-align: left;
+    width: 650px;
+}
+
+#pots {
+    height: 1em;
+    padding-top: 0.5em;
+    text-align: center;
+}
+
+#center-column {
+    display: flex;
+    flex: 1 1 50%;
+    flex-direction: column;
+}
+
+#players-top {
+    flex: 1 1 150px;
+}
+
+#center-board {
+    flex: 1 1 230px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#user {
+    flex: 1 1 200px;
+}
+
+#players-top .player {
+    flex: 1 1;
+}
+
+.player {
+    flex: 0 0 30%;
+    min-width: 160px;
+}
+
+.player .card {
+    width: 70px;
+    margin: 0 1px;
+}
+
+#user {
+    text-align: center;
+    width: 100%;
+}
+
+#user-info {
+    width: 180px;
+}
+
+#user .player {
+    min-height: initial;
+    min-width: initial;
+}
+
+#user-cards {
+    display: inline-block;
+    width: 270px;
+    vertical-align: bottom;
+}
+
+#user-cards .card {
+    margin: 0 3px;
+}
+
+.player .cards {
+    height: 102px;
+}
+
+.player-info {
+    background: #333;
+    color: #eee;
+    width: 180px;
+    text-align: left;
+    margin: 0 auto;
+}
+
+.player.folded .player-info {
+    opacity: 0.2;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.player .name {
+    color: #fa7;
+}
+
+.player .money {
+    font-size: 0.8em;
+}
+
+.player .text {
+    font-size: 1em;
+    white-space: pre;
+}
+
+.player .name, .player .text {
+    display: inline-block;
+    font-size: 0.8em;
+}
+
+.player .name, .player .money {
+    margin: 0 auto;
+    padding-left: 10px;
+    text-align: left;
+}
+
+#bet-controls, #user-stuff {
+    display: inline-block;
+}
+
+#bet-controls input, #bet-controls button {
+    font-size: 16px;
+}
+
+#bet {
+    border: none;
+    height: 40px;
+    padding: 0;
+    width: 80px;
+}
+
+#raise {
+    height: 40px;
+    width: 60px !important;
+}
+
+#decrease-bet, #increase-bet {
+    height: 40px;
+    width: 30px;
+}
+
+#call, #check, #all-in, #fold {
+    height: 40px;
+    width: 200px !important;
+}
+
+.table {
+    background: #335;
+    width: 100%;
+}
+.table:nth-child(odd) {
+    background: #557;
+}

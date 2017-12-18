@@ -1,4 +1,4 @@
-const CARD_PATH: string = "img/cards/"
+const CARD_PATH: string = "../img/cards/"
 
 enum HandCombinations {
     HighCard,

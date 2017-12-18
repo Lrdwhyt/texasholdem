@@ -55,17 +55,6 @@ class OfflineMatch {
 
 }
 
-class MatchController {
-    match: OfflineMatch;
-
-    constructor(match: OfflineMatch) {
-        this.match = match;
-        document.getElementById("next-game").addEventListener("click", (e) => {
-            match.startGame();
-        });
-    }
-}
-
 class OfflineGame {
     private players: Player[];
     private bettingPlayers: Player[];
@@ -478,7 +467,6 @@ class OfflineGame {
         }
         let amountToCall: number = this.currentBet - this.bets[player.getName()];
         if (Betting.isValidBet(player, bet, amountToCall, this.minRaise) === false) {
-            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.minRaise, this.getEligiblePot));
             return; // Not a valid bet
         }
 
