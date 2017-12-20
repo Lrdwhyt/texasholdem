@@ -41,14 +41,16 @@ class BetAwaitEvent implements GameEvent {
     public callback;
     public current: number;
     public committed: number;
+    public canRaise: boolean;
     public minRaise: number;
     public potCheck;
 
-    constructor(player: Player, callback, current: number, committed: number, minRaise: number, potCheck) {
+    constructor(player: Player, callback, current: number, committed: number, canRaise: boolean, minRaise: number, potCheck) {
         this.player = player;
         this.callback = callback;
         this.current = current;
         this.committed = committed;
+        this.canRaise = canRaise;
         this.minRaise = minRaise;
         this.potCheck = potCheck;
     }

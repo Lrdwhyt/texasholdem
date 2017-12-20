@@ -3,7 +3,7 @@ enum BetType {
     Check,
     Call,
     Raise,
-    All_in
+    AllIn
 };
 
 class Bet {
@@ -52,7 +52,7 @@ class Pot {
 }
 
 class Betting {
-    static isValidBet(player: Player, bet: Bet, amountToCall: number, minRaise: number): boolean {
+    static isValidBet(player: Player, bet: Bet, amountToCall: number, canRaise: boolean, minRaise: number): boolean {
         switch (bet.type) {
             case BetType.Call:
                 if (amountToCall > 0 && player.getMoney() > 0) {
@@ -62,7 +62,7 @@ class Betting {
                 }
 
             case BetType.Raise:
-                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || (bet.amount > amountToCall && amountToCall + minRaise > player.getMoney()))) {
+                if (canRaise === true && player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || (bet.amount > amountToCall && amountToCall + minRaise > player.getMoney()))) {
                     return true;
                 } else {
                     return false;

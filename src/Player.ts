@@ -52,6 +52,7 @@ class UserController implements Controller {
     player: Player;
     root: HTMLElement;
     amountToCall: number;
+    canRaise: boolean;
     minRaise: number;
     view: UserView;
 
@@ -61,15 +62,16 @@ class UserController implements Controller {
     }
 
     placeBet(bet: Bet) {
-        if (bet.type === BetType.All_in) {
+        if (bet.type === BetType.AllIn) {
             if (this.player.getMoney() <= this.amountToCall) {
                 bet = new Bet(BetType.Call);
             } else {
                 bet = new Bet(BetType.Raise, this.player.getMoney());
             }
         }
-        if (Betting.isValidBet(this.player, bet, this.amountToCall, this.minRaise)) {
+        if (Betting.isValidBet(this.player, bet, this.amountToCall, this.canRaise, this.minRaise)) {
             this.view.disableBetting();
+            console.log("Player bet");
             this.callbackFunction(this.player, bet);
         } else {
             this.view.notifyInvalidBet();
@@ -104,8 +106,9 @@ class UserController implements Controller {
                 console.log("Your turn!");
                 this.callbackFunction = e.callback;
                 this.amountToCall = e.current - e.committed;
+                this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
-                this.view.restrictToValid(e.current, e.committed, e.minRaise, this.player.getMoney());
+                this.view.restrictToValid(e.current, e.committed, e.canRaise, e.minRaise, this.player.getMoney());
             }
 
         } else if (e instanceof BetMadeEvent) {
@@ -224,7 +227,7 @@ class UserView {
             this.controller.placeBet(new Bet(BetType.Fold));
         });
         this.root.querySelector("#all-in").addEventListener("click", () => {
-            this.controller.placeBet(new Bet(BetType.All_in));
+            this.controller.placeBet(new Bet(BetType.AllIn));
         });
     }
 
@@ -392,7 +395,7 @@ class UserView {
         }
     }
 
-    restrictToValid(current: number, committed: number, minRaise: number, money: number): void {
+    restrictToValid(current: number, committed: number, canRaise: boolean, minRaise: number, money: number): void {
         (<HTMLInputElement>document.getElementById("bet")).value = String(current - committed + minRaise);
         (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
         (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
@@ -413,7 +416,7 @@ class UserView {
             document.getElementById("call").textContent = "Call";
         }
 
-        if (money > amountToCall) {
+        if (canRaise === true && money > amountToCall) {
             (<HTMLButtonElement>document.getElementById("raise")).disabled = false;
         } else {
             (<HTMLButtonElement>document.getElementById("raise")).disabled = true;

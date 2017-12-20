@@ -313,6 +313,9 @@ class AIController implements Controller {
 
             if (e.player === this.player) {
                 let bet = this.calculateBet(this.hand, this.board, e.current, e.committed, e.minRaise, this.player.getMoney(), e.potCheck);
+                if (e.canRaise === false && bet.type === BetType.Raise) {
+                    bet = new Bet(BetType.Call);
+                }
                 setTimeout(() => e.callback(this.player, bet), 700); // delay AI moves to make game more realistic
             }
 

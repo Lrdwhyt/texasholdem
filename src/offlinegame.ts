@@ -78,6 +78,8 @@ class OfflineGame {
     private currentPlayer: Player;
     private lastPlayer: Player;
     private lastRaiser: Player;
+
+    private canRaise: boolean;
     private lastPlayerFlag: boolean;
 
     private bettingStage: BettingStage;
@@ -111,6 +113,7 @@ class OfflineGame {
         this.currentPlayer = this.firstPlayer;
         this.lastRaiser = null;
 
+        this.canRaise = true;
         this.lastPlayerFlag = false;
 
         this.bettingStage = BettingStage.NONE;
@@ -136,7 +139,7 @@ class OfflineGame {
         }
 
         this.bettingStage = BettingStage.PREFLOP;
-        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.minRaise, this.getEligiblePot));
+        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
     }
 
     dispatchEvent(e: GameEvent) {
@@ -296,38 +299,6 @@ class OfflineGame {
         this.dispatchEvent(new PotChangeEvent(this.pots));
     }
 
-    isValidBet(player: Player, bet: Bet): boolean {
-        switch (bet.type) {
-            case BetType.Call:
-                if (this.currentBet - this.bets[player.getName()] > 0 && player.getMoney() > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-
-            case BetType.Raise:
-                let amountToCall: number = this.currentBet - this.bets[player.getName()];
-                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + this.minRaise || bet.amount === player.getMoney())) {
-                    return true;
-                } else {
-                    return false;
-                }
-
-            case BetType.Check:
-                if (this.currentBet - this.bets[player.getName()] === 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-
-            case BetType.Fold:
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
     removeFromBetting(player: Player): void {
         if (player === this.lastPlayer) {
             this.lastPlayer = this.getPrevPlayer(this.lastPlayer);
@@ -345,9 +316,9 @@ class OfflineGame {
     }
 
     processBet(player: Player, bet: Bet): void {
+        let amountToCall: number = this.currentBet - this.bets[player.getName()];
         switch (bet.type) {
             case BetType.Call:
-                let amountToCall = this.currentBet - this.bets[player.getName()];
                 if (player.getMoney() > amountToCall) {
                     this.bets[player.getName()] += amountToCall;
                     this.modMoney(player, -amountToCall);
@@ -366,12 +337,13 @@ class OfflineGame {
                 break;
 
             case BetType.Raise:
-                this.lastRaiser = player;
-                this.lastPlayer = this.getPrevPlayer(this.lastRaiser);
-                if (bet.amount - this.currentBet > this.minRaise) {
-                    this.minRaise = bet.amount - this.currentBet;
+                if (bet.amount - amountToCall >= this.minRaise) {
+                    this.lastRaiser = player;
+                    this.canRaise = true;
+                    this.minRaise = bet.amount - amountToCall;
                 }
-                this.currentBet += bet.amount - (this.currentBet - this.bets[player.getName()]);
+                this.lastPlayer = this.getPrevPlayer(player);
+                this.currentBet += bet.amount - amountToCall;
                 this.bets[player.getName()] += bet.amount;
                 if (bet.amount === player.getMoney()) { // Player raises to all-in
                     this.addBaseline(this.bets[player.getName()]);
@@ -466,7 +438,8 @@ class OfflineGame {
             return; // Not player's turn to bet
         }
         let amountToCall: number = this.currentBet - this.bets[player.getName()];
-        if (Betting.isValidBet(player, bet, amountToCall, this.minRaise) === false) {
+        if (Betting.isValidBet(player, bet, amountToCall, this.canRaise, this.minRaise) === false) {
+            console.log("[GameBug] " + player.getName() + " made an invalid bet: " + bet.type + ", " + bet.amount);
             return; // Not a valid bet
         }
 
@@ -474,6 +447,10 @@ class OfflineGame {
         this.processBet(player, bet);
         this.updatePots();
         this.dispatchEvent(new BetMadeEvent(player, bet));
+
+        if (this.lastRaiser === this.currentPlayer) {
+            this.canRaise = false; // No one after this can raise anymore
+        }
 
         if (this.unfoldedPlayers.length === 1) { // Last player wins by default
             this.finish();
@@ -492,6 +469,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.FLOP;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.canRaise = true;
                     break;
 
                 case BettingStage.FLOP:
@@ -499,6 +477,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.TURN;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.canRaise = true;
                     break;
 
                 case BettingStage.TURN:
@@ -506,6 +485,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.RIVER;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.canRaise = true;
                     break;
 
                 case BettingStage.RIVER:
@@ -515,7 +495,7 @@ class OfflineGame {
             }
         }
         if (this.bettingStage !== BettingStage.COMPLETE) {
-            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.minRaise, this.getEligiblePot));
+            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
         }
     }
 
