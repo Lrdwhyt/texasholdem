@@ -71,7 +71,6 @@ class UserController implements Controller {
         }
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.canRaise, this.minRaise)) {
             this.view.disableBetting();
-            console.log("Player bet");
             this.callbackFunction(this.player, bet);
         } else {
             this.view.notifyInvalidBet();
@@ -92,7 +91,7 @@ class UserController implements Controller {
         } else if (e instanceof PlayerMoneyChangeEvent) {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
             document.querySelector("[name=" + e.player.getName() + "] .money").textContent = "$" + e.player.getMoney().toString();
-            console.log(e.player.getName() + " money changed: " + e.change);
+            console.log("[GameEvent] " + e.player.getName() + " money changed: " + e.change);
 
         } else if (e instanceof DealtHandEvent) {
 
@@ -101,6 +100,8 @@ class UserController implements Controller {
             }
 
         } else if (e instanceof BetAwaitEvent) {
+
+            this.view.updateTurn(e.player.getName());
 
             if (e.player === this.player) {
                 console.log("Your turn!");
@@ -113,6 +114,7 @@ class UserController implements Controller {
 
         } else if (e instanceof BetMadeEvent) {
 
+            this.view.updateTurnRemove(e.player.getName());
             let msg: string = "[GameBetting] ";
 
             switch (e.bet.type) {
@@ -250,10 +252,6 @@ class UserView {
         document.getElementById("players-left").innerHTML = "";
         document.getElementById("players-top").innerHTML = "";
         document.getElementById("players-right").innerHTML = "";
-        let texts = document.querySelectorAll(".text")
-        for (let i = 0; i < texts.length; ++i) {
-            texts[i].innerHTML = "he";
-        };
     }
 
     resetBetting(): void {
@@ -280,10 +278,13 @@ class UserView {
         money.textContent = player.getMoney().toString();
         let text = document.createElement("span");
         text.className = "text";
+        let timeBar = document.createElement("div");
+        timeBar.className = "timebar";
         playerRoot.appendChild(cards);
         playerInfo.appendChild(name);
         playerInfo.appendChild(text);
         playerInfo.appendChild(money);
+        playerInfo.appendChild(timeBar);
         playerRoot.appendChild(playerInfo);
         return playerRoot;
     }
@@ -303,10 +304,13 @@ class UserView {
         money.textContent = player.getMoney().toString();
         let text = document.createElement("span");
         text.className = "text";
+        let timeBar = document.createElement("div");
+        timeBar.className = "timebar";
 
         playerInfo.appendChild(name);
         playerInfo.appendChild(text);
         playerInfo.appendChild(money);
+        playerInfo.appendChild(timeBar);
         playerRoot.appendChild(playerInfo);
         document.getElementById("user-info").appendChild(playerRoot);
     }
@@ -425,6 +429,20 @@ class UserView {
 
     updatePlayerMoney(playerName: string, amount: number): void {
         
+    }
+
+    updateTurnRemove(playerName: string): void {
+        document.querySelector("[name=" + playerName + "]").classList.remove("awaiting");
+    }
+
+    updateTurn(playerName: string): void {
+        let awaitingPlayers = document.getElementsByClassName("awaiting");
+        for (let i = 0; i < awaitingPlayers.length; ++i) {
+            awaitingPlayers[i].classList.remove("awaiting");
+        }
+        let playerBlock: HTMLDivElement = document.querySelector("[name=" + playerName + "]");
+        playerBlock.classList.add("awaiting");
+        playerBlock.querySelector(".text").innerHTML = "";
     }
 
 }

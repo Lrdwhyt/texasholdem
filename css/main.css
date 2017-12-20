@@ -182,6 +182,15 @@ html, body {
     text-align: left;
 }
 
+.player.awaiting .timebar {
+    background: #6f9;
+}
+
+.player .timebar {
+    background: #333;
+    height: 3px;
+}
+
 #bet-controls, #user-stuff {
     display: inline-block;
 }

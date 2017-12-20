@@ -337,7 +337,7 @@ class OfflineGame {
                 break;
 
             case BetType.Raise:
-                if (bet.amount - amountToCall >= this.minRaise) {
+                if (bet.amount - amountToCall >= this.minRaise) { // If raise is greater than min-raise amount, re-open betting
                     this.lastRaiser = player;
                     this.canRaise = true;
                     this.minRaise = bet.amount - amountToCall;
