@@ -44,7 +44,7 @@ class AppController {
         let m = new OfflineMatch();
         let k = document.getElementById("next-game").cloneNode(true);
         document.getElementById("next-game").parentNode.replaceChild(k, document.getElementById("next-game"));
-        document.getElementById("next-game").addEventListener("click", (e) => {
+        document.getElementById("next-game").addEventListener("click", () => {
             m.startGame();
         });
 
@@ -90,7 +90,7 @@ class AppController {
     var getActiveMatches = function (): void {
         let activeMatches: XMLHttpRequest = new XMLHttpRequest();
         activeMatches.open("GET", "tables/all");
-        activeMatches.addEventListener("load", function (e) {
+        activeMatches.addEventListener("load", () => {
             console.log(this.responseText);
             fillActiveMatches(JSON.parse(this.responseText));
         });

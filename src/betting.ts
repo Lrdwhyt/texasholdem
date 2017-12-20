@@ -37,7 +37,7 @@ class Pot {
     size(): number {
         let size: number = 0;
         let obj = this.bets;
-        Object.keys(this.bets).forEach(function (key, index, b) {
+        Object.keys(this.bets).forEach(function (key) {
             size += obj[key];
         });
         return size;

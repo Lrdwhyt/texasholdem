@@ -90,7 +90,6 @@ class UserController implements Controller {
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
-            document.querySelector("[name=" + e.player.getName() + "] .money").textContent = "$" + e.player.getMoney().toString();
             console.log("[GameEvent] " + e.player.getName() + " money changed: " + e.change);
 
         } else if (e instanceof DealtHandEvent) {
@@ -186,7 +185,7 @@ class UserController implements Controller {
                         ele.textContent += " (" + e.moneyChange[playerName] + ")";
                     }
                 }
-                Object.keys(e.result).forEach((key, i) => {
+                Object.keys(e.result).forEach((key) => {
                     if (e.result[key].player === this.player.getName()) {
                         return;
                     }
@@ -428,7 +427,7 @@ class UserView {
     }
 
     updatePlayerMoney(playerName: string, amount: number): void {
-        
+        document.querySelector("[name=" + playerName + "]").getElementsByClassName("money")[0].textContent = "$" + String(amount);
     }
 
     updateTurnRemove(playerName: string): void {

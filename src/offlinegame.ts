@@ -79,7 +79,7 @@ class OfflineGame {
     private firstPlayer: Player;
     private currentPlayer: Player;
     private lastPlayer: Player;
-    private lastRaiser: Player | undefined;
+    private lastRaiser: Player;
 
     private canRaise: boolean;
     private lastPlayerFlag: boolean;
@@ -272,7 +272,6 @@ class OfflineGame {
         let results = {};
         let winners: Player[] = [];
         let bestScore: number = 0;
-        let bestHand: Card[];
         for (let player of pot.players) {
             let playerHand = Hands.bestHand(player.getHand().concat(this.flop).concat(this.turn).concat(this.river));
             let playerScore: number = playerHand.score;
@@ -286,7 +285,6 @@ class OfflineGame {
             if (playerScore > bestScore) {
                 bestScore = playerScore;
                 winners = [player];
-                bestHand = playerHand.hand;
             } else if (playerScore === bestScore) {
                 winners.push(player);
             }
