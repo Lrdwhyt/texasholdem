@@ -64,12 +64,12 @@ class AIController implements Controller {
 
         let amountToCall = currentBet - committed;
         let amountToRaise = currentBet - committed + minRaise;
-        if (amountToRaise > money) {
+        if (amountToRaise > money && money > amountToCall) {
             amountToRaise = money;
         }
 
         let potOdds = amountToCall / potCheck(this.player, amountToCall);
-        console.log("Pot odds: " + potOdds + ", win ratio: " + winRatio);
+        console.log("[AIDecision] " + this.player.getName() + "/ Pot odds: " + potOdds + ", win ratio: " + winRatio);
 
         if (winRatio === 1) {
             if (money > amountToCall) {

@@ -62,7 +62,7 @@ class Betting {
                 }
 
             case BetType.Raise:
-                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || bet.amount === player.getMoney())) {
+                if (player.getMoney() >= bet.amount && (bet.amount >= amountToCall + minRaise || (bet.amount > amountToCall && amountToCall + minRaise > player.getMoney()))) {
                     return true;
                 } else {
                     return false;

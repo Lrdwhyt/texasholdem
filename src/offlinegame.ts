@@ -347,10 +347,10 @@ class OfflineGame {
     processBet(player: Player, bet: Bet): void {
         switch (bet.type) {
             case BetType.Call:
-                let toCallDifference = this.currentBet - this.bets[player.getName()];
-                if (player.getMoney() > toCallDifference) {
-                    this.bets[player.getName()] += toCallDifference;
-                    this.modMoney(player, -toCallDifference);
+                let amountToCall = this.currentBet - this.bets[player.getName()];
+                if (player.getMoney() > amountToCall) {
+                    this.bets[player.getName()] += amountToCall;
+                    this.modMoney(player, -amountToCall);
                 } else { // Player is all-in
                     this.bets[player.getName()] += player.getMoney();
                     this.modMoney(player, -player.getMoney());

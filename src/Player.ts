@@ -88,6 +88,7 @@ class UserController implements Controller {
             this.view.drawBoard(otherPlayers);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
+            this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
             document.querySelector("[name=" + e.player.getName() + "] .money").textContent = "$" + e.player.getMoney().toString();
             console.log(e.player.getName() + " money changed: " + e.change);
 
@@ -109,32 +110,32 @@ class UserController implements Controller {
 
         } else if (e instanceof BetMadeEvent) {
 
-            let msg = "";
+            let msg: string = "[GameBetting] ";
 
             switch (e.bet.type) {
                 case BetType.Raise:
-                    msg = e.player.getName() + " bet " + e.bet.amount;
+                    msg += e.player.getName() + " bet " + e.bet.amount;
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " bet $" + e.bet.amount;
                     break;
 
                 case BetType.Call:
-                    msg = e.player.getName() + " called"
+                    msg += e.player.getName() + " called"
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " called";
                     break;
 
                 case BetType.Check:
-                    msg = e.player.getName() + " checked"
+                    msg += e.player.getName() + " checked"
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " checked";
                     break;
 
                 case BetType.Fold:
-                    msg = e.player.getName() + " folded";
+                    msg += e.player.getName() + " folded";
                     document.querySelector("[name=" + e.player.getName() + "] .text").textContent = " folded";
                     document.querySelector("[name=" + e.player.getName() + "]").className += " folded";
                     break;
 
                 default:
-                    msg = e.player.getName() + " made an unrecognised action";
+                    msg += e.player.getName() + " made an unrecognised action";
                     break;
             }
 
@@ -396,11 +397,13 @@ class UserView {
         (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
         (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
 
+        let amountToCall = current - committed;
+
         if (current - committed > 0) {
             (<HTMLButtonElement>document.getElementById("call")).disabled = false;
             (<HTMLButtonElement>document.getElementById("check")).disabled = true;
             if (money >= current - committed) {
-                document.getElementById("call").textContent = "Call (-" + (current - committed) + ")";
+                document.getElementById("call").textContent = "Call (-" + amountToCall + ")";
             } else {
                 document.getElementById("call").textContent = "Call (-" + money + ")";
             }
@@ -410,11 +413,15 @@ class UserView {
             document.getElementById("call").textContent = "Call";
         }
 
-        if (minRaise + current - committed > money) {
-            (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
-        } else {
+        if (money > amountToCall) {
             (<HTMLButtonElement>document.getElementById("raise")).disabled = false;
+        } else {
+            (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
         }
+    }
+
+    updatePlayerMoney(playerName: string, amount: number): void {
+        
     }
 
 }
