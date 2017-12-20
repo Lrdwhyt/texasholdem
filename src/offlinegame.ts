@@ -33,7 +33,7 @@ class OfflineMatch {
             player.getController().dispatchEvent(e);
         }
         if (e instanceof GameEndEvent) {
-            this.game = null;
+            this.game = undefined;
             for (let i = this.players.length - 1; i >= 0; --i) {
                 if (this.players[i].getMoney() <= 0) {
                     this.players.splice(i, 1);
@@ -77,7 +77,7 @@ class OfflineGame {
     private firstPlayer: Player;
     private currentPlayer: Player;
     private lastPlayer: Player;
-    private lastRaiser: Player;
+    private lastRaiser: Player | undefined;
 
     private canRaise: boolean;
     private lastPlayerFlag: boolean;
@@ -469,7 +469,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.FLOP;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = this.lastPlayer;
+                    this.lastRaiser = undefined;
                     this.canRaise = true;
                     break;
 
@@ -478,7 +478,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.TURN;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = this.lastPlayer;
+                    this.lastRaiser = undefined;
                     this.canRaise = true;
                     break;
 
@@ -487,7 +487,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.RIVER;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = this.lastPlayer;
+                    this.lastRaiser = undefined;
                     this.canRaise = true;
                     break;
 
