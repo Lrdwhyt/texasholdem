@@ -469,6 +469,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.FLOP;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.lastRaiser = this.lastPlayer;
                     this.canRaise = true;
                     break;
 
@@ -477,6 +478,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.TURN;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.lastRaiser = this.lastPlayer;
                     this.canRaise = true;
                     break;
 
@@ -485,6 +487,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.RIVER;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
+                    this.lastRaiser = this.lastPlayer;
                     this.canRaise = true;
                     break;
 
