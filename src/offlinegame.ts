@@ -499,7 +499,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.FLOP;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = undefined;
+                    this.lastRaiser = this.firstPlayer; // Allows big blind to raise if betting is checked to them
                     this.canRaise = true;
                     break;
 
@@ -508,7 +508,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.TURN;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = undefined;
+                    this.lastRaiser = this.firstPlayer;
                     this.canRaise = true;
                     break;
 
@@ -517,7 +517,7 @@ class OfflineGame {
                     this.bettingStage = BettingStage.RIVER;
                     this.currentPlayer = this.firstPlayer;
                     this.lastPlayer = this.getPrevPlayer(this.firstPlayer);
-                    this.lastRaiser = undefined;
+                    this.lastRaiser = this.firstPlayer;
                     this.canRaise = true;
                     break;
 
