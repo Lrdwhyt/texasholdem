@@ -49,7 +49,7 @@ class OfflineMatch {
                 this.buttonPosition = 0;
             }
             ++this.hands;
-            this.game = new OfflineGame(this.players, this.buttonPosition, this, 50 * Math.pow(3, Math.floor(this.hands / 5)));
+            this.game = new OfflineGame(this.players, this.buttonPosition, this, 50 * Math.pow(2, Math.floor(this.hands / 6)));
         }
     }
 
@@ -71,6 +71,8 @@ class OfflineGame {
     private initialMoney: { [name: string]: number };
 
     private ante: number;
+    private smallBlind: number;
+    private bigBlind: number;
     private currentBet: number;
     private minRaise: number;
 
@@ -105,8 +107,10 @@ class OfflineGame {
         this.initialMoney = {};
 
         this.ante = ante;
-        this.currentBet = this.ante;
-        this.minRaise = this.ante * 2;
+        this.smallBlind = ante * 4;
+        this.bigBlind = ante * 8;
+        this.currentBet = this.ante + this.bigBlind;
+        this.minRaise = this.bigBlind;
 
         this.firstPlayer = this.getPrevPlayer(this.players[button]);
         this.lastPlayer = this.getPrevPlayer(this.firstPlayer); //Where to end betting if no one raises
@@ -132,6 +136,13 @@ class OfflineGame {
 
         this.dispatchEvent(new GameStartEvent(this.players));
         this.deductAntes(this.ante);
+        if (this.players.length === 2) { // Blinds have special rules with only 2 players
+            this.deductBlind(this.firstPlayer, this.smallBlind);
+            this.deductBlind(this.lastPlayer, this.bigBlind);
+        } else {
+            this.deductBlind(this.getPrevPlayer(this.lastPlayer), this.smallBlind);
+            this.deductBlind(this.lastPlayer, this.bigBlind);
+        }
         this.deal();
 
         for (let player of this.players) {
@@ -175,6 +186,22 @@ class OfflineGame {
                 this.addBaseline(this.bets[player.getName()]);
                 this.removeFromBetting(player);
             }
+        }
+    }
+
+    deductBlind(player: Player, amount: number) {
+        if (player.getMoney() >= amount) {
+            this.bets[player.getName()] += amount;
+            this.modMoney(player, -amount);
+            if (player.getMoney() === 0) {
+                this.addBaseline(this.bets[player.getName()]);
+                this.removeFromBetting(player);
+            }
+        } else { // Not enough money to cover blind
+            this.bets[player.getName()] += player.getMoney();
+            this.modMoney(player, -player.getMoney());
+            this.addBaseline(this.bets[player.getName()]);
+            this.removeFromBetting(player);
         }
     }
 
@@ -309,9 +336,12 @@ class OfflineGame {
         if (player === this.currentPlayer) {
             this.currentPlayer = this.getNextPlayer(this.currentPlayer);
         }
-        this.bettingPlayers.splice(this.bettingPlayers.indexOf(player), 1);
-        if (this.bettingPlayers.length === 1 && this.bets[this.bettingPlayers[0].getName()] === this.currentBet) {
-            this.bettingPlayers.pop();
+        let index = this.bettingPlayers.indexOf(player);
+        if (index !== -1) {
+            this.bettingPlayers.splice(index, 1);
+            if (this.bettingPlayers.length === 1 && this.bets[this.bettingPlayers[0].getName()] === this.currentBet) {
+                this.bettingPlayers.pop();
+            }
         }
     }
 
