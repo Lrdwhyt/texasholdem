@@ -12,11 +12,41 @@ enum HandCombinations {
     StraightFlush
 }
 
-enum Suit {
-    Spades = "S",
-    Hearts = "H",
-    Diamonds = "D",
-    Clubs = "C"
+class Suit {
+    static Spades = new Suit("Spades");
+    static Hearts = new Suit("Hearts");
+    static Diamonds = new Suit("Diamonds");
+    static Clubs = new Suit("Clubs");
+
+    private readonly val: string;
+
+    constructor(suit: string) {
+        this.val = suit;
+    }
+
+    public toString(): string {
+        return this.val;
+    }
+
+    public getShorthand(): string {
+        return this.val.charAt(0);
+    }
+
+    public getSymbol(): string {
+        switch (this.val) {
+            case "S":
+                return "♠";
+
+            case "H":
+                return "♥";
+
+            case "D":
+                return "♦";
+
+            case "C":
+                return "♣";
+        }
+    }
 }
 
 class Rank {
@@ -46,7 +76,7 @@ class Rank {
         } else {
             return this.val - 1;
         }
-        
+
     }
 
     public valueAceLow(): number {
@@ -54,7 +84,7 @@ class Rank {
     }
 
     public toString(): string {
-        switch(this.val) {
+        switch (this.val) {
             case 1:
                 return "A";
 
@@ -88,14 +118,14 @@ class Card {
 
     getImage(): HTMLElement {
         let img = document.createElement("img");
-        img.src = CARD_PATH + this.suit + this.rank.toString() + ".png";
+        img.src = CARD_PATH + this.suit.getShorthand() + this.rank.toString() + ".png";
         img.alt = this.toString();
         img.className = "card";
         return img;
     }
 
     toString(): string {
-        return this.rank.toString() + this.suit;
+        return this.suit.getSymbol() + this.rank.toString();
     }
 
 }
