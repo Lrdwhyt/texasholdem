@@ -59,6 +59,10 @@ html, body {
     text-align: center;
 }
 
+.card {
+    border-radius: 3%;
+}
+
 #board .card {
     margin: 0 5px;
 }

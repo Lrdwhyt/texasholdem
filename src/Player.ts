@@ -419,6 +419,10 @@ class UserView {
             document.getElementById("call").textContent = "Call";
         }
 
+        if (canRaise === false && money > amountToCall) {
+            (<HTMLButtonElement>document.getElementById("all-in")).disabled = true;
+        }
+
         if (canRaise === true && money > amountToCall) {
             (<HTMLButtonElement>document.getElementById("raise")).disabled = false;
         } else {
