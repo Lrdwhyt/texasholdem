@@ -88,7 +88,7 @@ class Card {
 
     getImage(): HTMLElement {
         let img = document.createElement("img");
-        img.src = CARD_PATH + this.rank.toString() + this.suit + ".png";
+        img.src = CARD_PATH + this.suit + this.rank.toString() + ".png";
         img.alt = this.toString();
         img.className = "card";
         return img;
