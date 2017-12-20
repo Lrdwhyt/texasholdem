@@ -28,7 +28,7 @@ class AIController implements Controller {
         let totalWins: number = 0;
         let totalDraws: number = 0;
 
-        let trials: number = 50;
+        let trials: number = 1000;
 
         for (let i = 0; i < trials; ++i) {
             deck.shuffle();

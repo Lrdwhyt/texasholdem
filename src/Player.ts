@@ -84,8 +84,10 @@ class UserController implements Controller {
             this.view.resetUI();
             let otherPlayers = e.players.slice(0);
             let index = otherPlayers.indexOf(this.player);
-            otherPlayers.splice(index, 1);
-            this.view.drawUser(this.player);
+            if (index !== -1) {
+                otherPlayers.splice(index, 1);
+                this.view.drawUser(this.player);
+            }
             this.view.drawBoard(otherPlayers);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
@@ -279,6 +281,7 @@ class UserView {
         text.className = "text";
         let timeBar = document.createElement("div");
         timeBar.className = "timebar";
+
         playerRoot.appendChild(cards);
         playerInfo.appendChild(name);
         playerInfo.appendChild(text);

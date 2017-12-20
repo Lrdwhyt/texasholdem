@@ -10,18 +10,19 @@ enum BettingStage {
 class OfflineMatch {
 
     private players: Player[];
+    private people: Player[];
     private game: OfflineGame;
     private buttonPosition: number;
     private hands: number;
 
     constructor() {
-        this.players = [];
+        this.people = [];
         this.buttonPosition = 0;
         this.hands = 0;
     }
 
     addPlayer(player: Player): void {
-        this.players.push(player);
+        this.people.push(player);
     }
 
     dispatchEvent(e: GameEvent): void {
@@ -29,20 +30,21 @@ class OfflineMatch {
             e.player.getController().dispatchEvent(e);
             return;
         }
-        for (let player of this.players) {
+        for (let player of this.people) {
             player.getController().dispatchEvent(e);
         }
         if (e instanceof GameEndEvent) {
             this.game = undefined;
-            for (let i = this.players.length - 1; i >= 0; --i) {
-                if (this.players[i].getMoney() <= 0) {
-                    this.players.splice(i, 1);
-                }
-            }
         }
     }
 
     startGame(): void {
+        this.players = [];
+        for (let person of this.people) {
+            if (person.getMoney() > 0) {
+                this.players.push(person);
+            }
+        }
         if (this.players.length >= 2 && (this.game === undefined || this.game === null)) {
             ++this.buttonPosition;
             if (this.buttonPosition >= this.players.length) {
