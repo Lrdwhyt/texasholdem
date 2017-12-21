@@ -52,6 +52,8 @@ class UserController implements Controller {
     player: Player;
     root: HTMLElement;
     amountToCall: number;
+    currentBet: number;
+    amountCommitted: number;
     canRaise: boolean;
     minRaise: number;
     hasQueuedBet: boolean;
@@ -118,7 +120,7 @@ class UserController implements Controller {
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.canRaise, this.minRaise)) {
             this.isTurnToBet = false;
             if (bet.type === BetType.Fold) {
-                //this.view.disableBetting();
+                this.view.disableBetting();
             }
             this.callbackFunction(this.player, bet);
         } else {
@@ -141,6 +143,11 @@ class UserController implements Controller {
             }
             this.view.drawBoard(otherPlayers);
             this.hasQueuedBet = false;
+            this.currentBet = 0;
+            this.minRaise = 0;
+            this.amountCommitted = 0;
+            this.amountToCall = 0;
+            this.view.fillBetAmount2(0);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
@@ -162,11 +169,21 @@ class UserController implements Controller {
                 this.amountToCall = e.current - e.committed;
                 this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
-                this.view.restrictToValid(e.current, e.committed, e.canRaise, e.minRaise, this.player.getMoney());
+                this.currentBet = e.current;
+                this.amountCommitted = e.committed;
+                this.view.disableBetting();
+                this.view.restrictToValid(this.amountToCall, e.canRaise, e.minRaise, this.player.getMoney());
                 this.isTurnToBet = true;
                 if (this.hasQueuedBet === true) {
                     this.placeBet(this.queuedBet);
                 }
+            } else {
+                this.currentBet = e.current;
+                this.amountToCall = this.currentBet - this.amountCommitted;
+                this.canRaise = e.canRaise;
+                this.minRaise = e.minRaise;
+                this.view.disableBetting();
+                this.view.restrictToValid(this.amountToCall, e.canRaise, e.minRaise, this.player.getMoney());
             }
 
         } else if (e instanceof BetMadeEvent) {
@@ -215,6 +232,8 @@ class UserController implements Controller {
             console.log("Flop dealt");
             this.hasQueuedBet = false;
             this.view.resetBetting();
+            this.view.resetBettingUI();
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
         } else if (e instanceof DealtTurnEvent) {
 
@@ -224,6 +243,8 @@ class UserController implements Controller {
             console.log("Turn dealt");
             this.hasQueuedBet = false;
             this.view.resetBetting();
+            this.view.resetBettingUI();
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
         } else if (e instanceof DealtRiverEvent) {
 
@@ -233,9 +254,11 @@ class UserController implements Controller {
             console.log("River dealt");
             this.hasQueuedBet = false;
             this.view.resetBetting();
+            this.view.resetBettingUI();
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
         } else if (e instanceof GameEndEvent) {
-
+            this.view.resetBettingUI();
             if (e.result) {
                 for (let playerName in e.moneyChange) {
                     if (e.moneyChange[playerName] > 0) {
@@ -278,6 +301,17 @@ class UserController implements Controller {
         return result;
     }
 
+    constrainBetAmount(amount: number): number {
+        let result: number = amount;
+        if (result < this.amountToCall + this.minRaise) {
+            result = this.amountToCall + this.minRaise;
+        }
+        if (result > this.player.getMoney()) {
+            result = this.player.getMoney();
+        }
+        return result;
+    }
+
 }
 
 class UserView {
@@ -308,7 +342,7 @@ class UserView {
             this.controller.placeBet(new Bet(BetType.AllIn));
         });
         document.getElementById("increase-bet").addEventListener("click", () => {
-            let betInput: HTMLInputElement = <HTMLInputElement> document.getElementById("bet");
+            let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
             betInput.value = String(this.controller.increaseBet(parseInt(betInput.value)));
         });
         document.getElementById("decrease-bet").addEventListener("click", () => {
@@ -318,11 +352,19 @@ class UserView {
     }
 
     disableBetting(): void {
-        (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
-        (<HTMLButtonElement>document.getElementById("call")).disabled = true;
-        (<HTMLButtonElement>document.getElementById("all-in")).disabled = true;
-        (<HTMLButtonElement>document.getElementById("check")).disabled = true;
-        (<HTMLButtonElement>document.getElementById("fold")).disabled = true;
+        let bettingButtons: HTMLCollectionOf<HTMLButtonElement> = <HTMLCollectionOf<HTMLButtonElement>>document.getElementsByClassName("bet-control");
+        for (let i = 0; i < bettingButtons.length; ++i) {
+            this.disableBetButton(bettingButtons[i]);
+        }
+    }
+
+    resetBettingUI(): void {
+        let bettingButtons: HTMLCollectionOf<HTMLButtonElement> = <HTMLCollectionOf<HTMLButtonElement>>document.getElementsByClassName("bet-control");
+        for (let i = 0; i < bettingButtons.length; ++i) {
+            bettingButtons[i].classList.remove("prebet");
+            //this.disableBetButton(bettingButtons[i]);
+        }
+        this.disableBetting();
     }
 
     notifyInvalidBet() {
@@ -484,35 +526,61 @@ class UserView {
         }
     }
 
-    restrictToValid(current: number, committed: number, canRaise: boolean, minRaise: number, money: number): void {
-        (<HTMLInputElement>document.getElementById("bet")).value = String(current - committed + minRaise);
-        (<HTMLButtonElement>document.getElementById("all-in")).disabled = false;
-        (<HTMLButtonElement>document.getElementById("fold")).disabled = false;
+    enableBetButton(button: HTMLButtonElement) {
+        button.disabled = false;
+        button.classList.remove("invalid-bet");
+    }
 
-        let amountToCall = current - committed;
+    disableBetButton(button: HTMLButtonElement) {
+        button.disabled = true;
+        button.classList.add("invalid-bet");
+    }
 
-        if (current - committed > 0) {
-            (<HTMLButtonElement>document.getElementById("call")).disabled = false;
-            (<HTMLButtonElement>document.getElementById("check")).disabled = true;
-            if (money >= current - committed) {
-                document.getElementById("call").textContent = "Call (-" + amountToCall + ")";
+    fillBetAmount2(amount: number) {
+        let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
+        let betAmount: number = amount;
+        betInput.value = String(this.controller.constrainBetAmount(betAmount));
+    }
+
+    fillBetAmount() {
+        let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
+        let betAmount: number = parseInt(betInput.value);
+        if (!(betAmount > 0)) {
+            betAmount = 0;
+        }
+        betInput.value = String(this.controller.constrainBetAmount(betAmount));
+    }
+
+    restrictToValid(amountToCall: number, canRaise: boolean, minRaise: number, money: number): void {
+        let allInButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("all-in");
+        let foldButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("fold");
+        let checkButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("check");
+        let callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("call");
+        let raiseButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("raise");
+
+        this.fillBetAmount();
+
+        this.enableBetButton(allInButton);
+        this.enableBetButton(foldButton);
+
+        if (amountToCall > 0) {
+            this.enableBetButton(callButton);
+            if (money >= amountToCall) {
+                callButton.textContent = "Call (-" + amountToCall + ")";
             } else {
-                document.getElementById("call").textContent = "Call (-" + money + ")";
+                callButton.textContent = "Call (-" + money + ")";
             }
         } else {
-            (<HTMLButtonElement>document.getElementById("call")).disabled = true;
-            (<HTMLButtonElement>document.getElementById("check")).disabled = false;
-            document.getElementById("call").textContent = "Call";
+            this.enableBetButton(checkButton);
+            callButton.textContent = "Call";
         }
 
-        if (canRaise === false && money > amountToCall) {
-            (<HTMLButtonElement>document.getElementById("all-in")).disabled = true;
+        if (canRaise === true || money <= amountToCall) {
+            this.enableBetButton(allInButton);
         }
 
         if (canRaise === true && money > amountToCall) {
-            (<HTMLButtonElement>document.getElementById("raise")).disabled = false;
-        } else {
-            (<HTMLButtonElement>document.getElementById("raise")).disabled = true;
+            this.enableBetButton(raiseButton);
         }
     }
 

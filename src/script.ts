@@ -23,19 +23,19 @@ class AppController {
                     <div id="bet-controls">
                         <span id="actions">
                             <div>
-                                <button id="check">Check</button>
+                                <button id="check" class="bet-control">Check</button>
                             </div>
                             <div>
-                                <button id="call">Call</button>
+                                <button id="call" class="bet-control">Call</button>
                             </div>
                             <div>
-                                <button id="all-in">All-in</button><button id="raise">Raise</button>
+                                <button id="all-in" class="bet-control">All-in</button><button id="raise" class="bet-control">Raise</button>
                             </div>
                             <div>
                                 <button id="decrease-bet">-</button><input type="text" id="bet"><button id="increase-bet">+</button>
                             </div>
                             <div>
-                                <button id="fold">Fold</button>
+                                <button id="fold" class="bet-control">Fold</button>
                             </div>
                         </span>
                     </div>
@@ -50,7 +50,7 @@ class AppController {
             match.startGame();
         });
 
-        let p1 = new Player("Human", 3000);
+        let p1 = new Player("Human", 13000);
         p1.setController(new UserController(p1, document.getElementById("user")));
         match.addPlayer(p1);
 

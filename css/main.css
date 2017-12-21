@@ -231,6 +231,10 @@ button#all-in {
     width: 200px !important;
 }
 
+.bet-control.invalid-bet {
+    opacity: 0.5;
+}
+
 button.prebet {
     border: 2px solid #eee !important;
 }
