@@ -262,6 +262,22 @@ class UserController implements Controller {
         }
     }
 
+    increaseBet(amount: number): number {
+        let result = Math.floor(amount + this.minRaise / 2);
+        if (result > this.player.getMoney()) {
+            result = this.player.getMoney();
+        }
+        return result;
+    }
+
+    decreaseBet(amount: number): number {
+        let result = Math.floor(amount - this.minRaise / 2);
+        if (result < this.amountToCall + this.minRaise) {
+            result = this.amountToCall + this.minRaise;
+        }
+        return result;
+    }
+
 }
 
 class UserView {
@@ -290,6 +306,14 @@ class UserView {
         });
         document.getElementById("all-in").addEventListener("click", () => {
             this.controller.placeBet(new Bet(BetType.AllIn));
+        });
+        document.getElementById("increase-bet").addEventListener("click", () => {
+            let betInput: HTMLInputElement = <HTMLInputElement> document.getElementById("bet");
+            betInput.value = String(this.controller.increaseBet(parseInt(betInput.value)));
+        });
+        document.getElementById("decrease-bet").addEventListener("click", () => {
+            let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
+            betInput.value = String(this.controller.decreaseBet(parseInt(betInput.value)));
         });
     }
 

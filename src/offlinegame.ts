@@ -56,8 +56,10 @@ class OfflineMatch {
     }
 
     finish() {
-        this.game.terminate();
-        this.game = null;
+        if (this.game !== null && this.game !== undefined) {
+            this.game.terminate();
+            this.game = null;
+        }
     }
 
 }
