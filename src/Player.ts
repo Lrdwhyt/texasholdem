@@ -65,6 +65,46 @@ class UserController implements Controller {
     }
 
     placeBet(bet: Bet) {
+        if (this.isTurnToBet === false) {
+            let bettingButtons = document.getElementsByClassName("prebet");
+            for (let i = 0; i < bettingButtons.length; ++i) {
+                bettingButtons[i].classList.remove("prebet");
+            }
+            if (this.hasQueuedBet === false || this.queuedBet.type !== bet.type) {
+                switch (bet.type) {
+                    case BetType.Raise:
+                        document.getElementById("raise").classList.add("prebet");
+                        break;
+
+                    case BetType.Check:
+                        document.getElementById("check").classList.add("prebet");
+                        break;
+
+                    case BetType.AllIn:
+                        document.getElementById("all-in").classList.add("prebet");
+                        break;
+
+                    case BetType.Call:
+                        document.getElementById("call").classList.add("prebet");
+                        break;
+
+                    case BetType.Fold:
+                        document.getElementById("fold").classList.add("prebet");
+                        break;
+                }
+                this.hasQueuedBet = true;
+                this.queuedBet = bet;
+            } else if (this.queuedBet.type === bet.type) {
+                this.hasQueuedBet = false;
+            }
+            return;
+        } else {
+            let bettingButtons = document.getElementsByClassName("prebet");
+            for (let i = 0; i < bettingButtons.length; ++i) {
+                bettingButtons[i].classList.remove("prebet");
+            }
+        }
+
         if (bet.type === BetType.AllIn) {
             if (this.player.getMoney() <= this.amountToCall) {
                 bet = new Bet(BetType.Call);
@@ -72,14 +112,14 @@ class UserController implements Controller {
                 bet = new Bet(BetType.Raise, this.player.getMoney());
             }
         }
-        if (this.isTurnToBet === false) {
-            this.hasQueuedBet = true;
-            this.queuedBet = bet;
-        }
-        
+
+        this.hasQueuedBet = false;
+
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.canRaise, this.minRaise)) {
-            // this.view.disableBetting();
             this.isTurnToBet = false;
+            if (bet.type === BetType.Fold) {
+                //this.view.disableBetting();
+            }
             this.callbackFunction(this.player, bet);
         } else {
             this.view.notifyInvalidBet();
@@ -123,10 +163,9 @@ class UserController implements Controller {
                 this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
                 this.view.restrictToValid(e.current, e.committed, e.canRaise, e.minRaise, this.player.getMoney());
-                if (this.hasQueuedBet === true && Betting.isValidBet(this.player, this.queuedBet, this.amountToCall, this.canRaise, this.minRaise) === true) {
+                this.isTurnToBet = true;
+                if (this.hasQueuedBet === true) {
                     this.placeBet(this.queuedBet);
-                } else {
-                    this.isTurnToBet = true;
                 }
             }
 
@@ -236,20 +275,20 @@ class UserView {
     }
 
     init(): void {
-        this.root.querySelector("#raise").addEventListener("click", () => {
+        document.getElementById("raise").addEventListener("click", () => {
             let amount = parseInt((<HTMLInputElement>document.getElementById("bet")).value);
             this.controller.placeBet(new Bet(BetType.Raise, amount));
         });
-        this.root.querySelector("#call").addEventListener("click", () => {
+        document.getElementById("call").addEventListener("click", () => {
             this.controller.placeBet(new Bet(BetType.Call));
         });
-        this.root.querySelector("#check").addEventListener("click", () => {
+        document.getElementById("check").addEventListener("click", () => {
             this.controller.placeBet(new Bet(BetType.Check));
         });
-        this.root.querySelector("#fold").addEventListener("click", () => {
+        document.getElementById("fold").addEventListener("click", () => {
             this.controller.placeBet(new Bet(BetType.Fold));
         });
-        this.root.querySelector("#all-in").addEventListener("click", () => {
+        document.getElementById("all-in").addEventListener("click", () => {
             this.controller.placeBet(new Bet(BetType.AllIn));
         });
     }

@@ -55,6 +55,11 @@ class OfflineMatch {
         }
     }
 
+    finish() {
+        this.game.terminate();
+        this.game = null;
+    }
+
 }
 
 class OfflineGame {
@@ -530,6 +535,11 @@ class OfflineGame {
         if (this.bettingStage !== BettingStage.COMPLETE) {
             this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
         }
+    }
+
+    terminate() {
+        this.currentPlayer = null;
+        // Prevent further bets
     }
 
 }
