@@ -20,17 +20,19 @@ class AppController {
                     </div>
                     <div id="bet-controls">
                         <span id="actions">
+                            
+                            
                             <div>
-                                <button id="all-in">All-in</button>
-                            </div>
-                            <div>
-                                <button id="decrease-bet">-</button><input type="text" id="bet"><button id="increase-bet">+</button><button id="raise">Raise</button>
+                                <button id="check">Check</button>
                             </div>
                             <div>
                                 <button id="call">Call</button>
                             </div>
                             <div>
-                                <button id="check">Check</button>
+                                <button id="all-in">All-in</button><button id="raise">Raise</button>
+                            </div>
+                            <div>
+                                <button id="decrease-bet">-</button><input type="text" id="bet"><button id="increase-bet">+</button>
                             </div>
                             <div>
                                 <button id="fold">Fold</button>

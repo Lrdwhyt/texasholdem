@@ -200,6 +200,7 @@ html, body {
 }
 
 #bet-controls input, #bet-controls button {
+    border: none;
     font-size: 16px;
 }
 
@@ -207,12 +208,17 @@ html, body {
     border: none;
     height: 40px;
     padding: 0;
-    width: 80px;
+    text-align: center;
+    width: 140px;
+}
+
+button#all-in {
+    width: 100px !important;
 }
 
 #raise {
     height: 40px;
-    width: 60px !important;
+    width: 100px !important;
 }
 
 #decrease-bet, #increase-bet {
@@ -223,6 +229,27 @@ html, body {
 #call, #check, #all-in, #fold {
     height: 40px;
     width: 200px !important;
+}
+
+button#all-in {
+    background: #b157e5;
+}
+
+button#call {
+    background: #f4ae01;
+}
+
+button#raise {
+    background: #63bbf9;
+}
+
+button#check {
+    background: #86f442;
+}
+
+button#fold {
+    background: #d33;
+    color: #fff;
 }
 
 .table {

@@ -54,6 +54,9 @@ class UserController implements Controller {
     amountToCall: number;
     canRaise: boolean;
     minRaise: number;
+    hasQueuedBet: boolean;
+    isTurnToBet: boolean;
+    queuedBet: Bet;
     view: UserView;
 
     constructor(player: Player, root: HTMLElement) {
@@ -69,8 +72,14 @@ class UserController implements Controller {
                 bet = new Bet(BetType.Raise, this.player.getMoney());
             }
         }
+        if (this.isTurnToBet === false) {
+            this.hasQueuedBet = true;
+            this.queuedBet = bet;
+        }
+        
         if (Betting.isValidBet(this.player, bet, this.amountToCall, this.canRaise, this.minRaise)) {
-            this.view.disableBetting();
+            // this.view.disableBetting();
+            this.isTurnToBet = false;
             this.callbackFunction(this.player, bet);
         } else {
             this.view.notifyInvalidBet();
@@ -87,8 +96,11 @@ class UserController implements Controller {
             if (index !== -1) {
                 otherPlayers.splice(index, 1);
                 this.view.drawUser(this.player);
+            } else {
+                document.getElementById("bet-controls").innerHTML = "";
             }
             this.view.drawBoard(otherPlayers);
+            this.hasQueuedBet = false;
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
@@ -111,6 +123,11 @@ class UserController implements Controller {
                 this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
                 this.view.restrictToValid(e.current, e.committed, e.canRaise, e.minRaise, this.player.getMoney());
+                if (this.hasQueuedBet === true && Betting.isValidBet(this.player, this.queuedBet, this.amountToCall, this.canRaise, this.minRaise) === true) {
+                    this.placeBet(this.queuedBet);
+                } else {
+                    this.isTurnToBet = true;
+                }
             }
 
         } else if (e instanceof BetMadeEvent) {
@@ -156,7 +173,8 @@ class UserController implements Controller {
             for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
-            console.log("Flop dealt")
+            console.log("Flop dealt");
+            this.hasQueuedBet = false;
             this.view.resetBetting();
 
         } else if (e instanceof DealtTurnEvent) {
@@ -164,7 +182,8 @@ class UserController implements Controller {
             for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
-            console.log("Turn dealt")
+            console.log("Turn dealt");
+            this.hasQueuedBet = false;
             this.view.resetBetting();
 
         } else if (e instanceof DealtRiverEvent) {
@@ -172,7 +191,8 @@ class UserController implements Controller {
             for (let card of e.cards) {
                 document.getElementById("board").appendChild(card.getImage());
             }
-            console.log("River dealt")
+            console.log("River dealt");
+            this.hasQueuedBet = false;
             this.view.resetBetting();
 
         } else if (e instanceof GameEndEvent) {
