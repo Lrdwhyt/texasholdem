@@ -1,13 +1,5 @@
 import { Player } from "./Player";
-import { Bet } from "./Bet";
-
-export enum BetType {
-    Fold,
-    Check,
-    Call,
-    Raise,
-    AllIn
-};
+import { Bet, BetType } from "./Bet";
 
 export class Betting {
     static isValidBet(player: Player, bet: Bet, amountToCall: number, canRaise: boolean, minRaise: number): boolean {

@@ -1,7 +1,7 @@
 import { UserController } from "./UserController";
 import { Player } from "./Player";
-import { Bet } from "./Bet";
-import { BetType, Betting } from "./betting";
+import { Bet, BetType } from "./Bet";
+import { Betting } from "./betting";
 import { Pot } from "./Pot";
 
 export class UserView {
@@ -250,10 +250,11 @@ export class UserView {
 
         this.fillBetAmount();
 
-        this.enableBetButton(allInButton);
-        this.enableBetButton(foldButton);
+        if (money > 0) {
+            this.enableBetButton(foldButton);
+        }
 
-        if (amountToCall > 0) {
+        if (amountToCall > 0 && money > 0) {
             this.enableBetButton(callButton);
             if (money >= amountToCall) {
                 callButton.textContent = "Call (-" + amountToCall + ")";
@@ -261,11 +262,13 @@ export class UserView {
                 callButton.textContent = "Call (-" + money + ")";
             }
         } else {
-            this.enableBetButton(checkButton);
+            if (money > 0) {
+                this.enableBetButton(checkButton);
+            }
             callButton.textContent = "Call";
         }
 
-        if (canRaise === true || money <= amountToCall) {
+        if (money > 0 && (canRaise === true || money <= amountToCall)) {
             this.enableBetButton(allInButton);
         }
 

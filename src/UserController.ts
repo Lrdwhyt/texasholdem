@@ -1,8 +1,8 @@
 import { UserView } from "./UserView";
 import { Player } from "./Player";
 import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
-import { Bet } from "./Bet";
-import { BetType, Betting } from "./betting";
+import { Bet, BetType } from "./Bet";
+import { Betting } from "./betting";
 
 export interface Controller {
     dispatchEvent(e: GameEvent): void;
@@ -256,10 +256,7 @@ export class UserController implements Controller {
 
     decreaseBet(amount: number): number {
         let result = Math.floor(amount - this.minRaise / 2);
-        if (result < this.amountToCall + this.minRaise) {
-            result = this.amountToCall + this.minRaise;
-        }
-        return result;
+        return this.constrainBetAmount(result);
     }
 
     constrainBetAmount(amount: number): number {

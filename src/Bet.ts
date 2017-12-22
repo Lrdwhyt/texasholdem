@@ -1,4 +1,12 @@
-import { BetType, Betting } from "./betting";
+import { Betting } from "./betting";
+
+export enum BetType {
+    Fold,
+    Check,
+    Call,
+    Raise,
+    AllIn
+};
 
 export class Bet {
     public type: BetType;

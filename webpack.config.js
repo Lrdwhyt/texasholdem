@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = [
     {
-        entry: './src/script.ts',
+        entry: './src/solo.ts',
         module: {
             rules: [
                 {
@@ -21,7 +21,7 @@ module.exports = [
         }
     },
     {
-        entry: "./src/script.ts",
+        entry: "./src/lobby.ts",
         module: {
             rules: [
                 {
@@ -35,7 +35,7 @@ module.exports = [
             extensions: ['.ts']
         },
         output: {
-            filename: 'online.js',
+            filename: 'lobby.js',
             path: path.resolve(__dirname, 'js')
         }
     }];

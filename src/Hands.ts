@@ -207,8 +207,8 @@ export class Hands {
         }
 
         if (mostCommonRanks[0].length === 4) { // Four of a kind
-            let quad = mostCommonRanks[0];
-            let kicker = this.getNHighestCards(this.difference(cards, quad), 1);
+            let quad: Card[] = mostCommonRanks[0];
+            let kicker: Card[] = this.getNHighestCards(this.difference(cards, quad), 1);
             hand = quad.concat(kicker);
             score = 7 * Math.pow(14, 5) + quad[0].rank.value() * 14 + kicker[0].rank.value();
             return {
@@ -217,8 +217,8 @@ export class Hands {
                 type: HandCombinations.FourOfAKind
             };
         } else if (mostCommonRanks[0].length === 3 && mostCommonRanks[1].length >= 2) { // Full house
-            let triple = mostCommonRanks[0];
-            let pair;
+            let triple: Card[] = mostCommonRanks[0];
+            let pair: Card[];
             if (mostCommonRanks[2].length === 2 && mostCommonRanks[2][0].rank.value() > mostCommonRanks[1][0].rank.value()) {
                 pair = mostCommonRanks[2];
             } else {
@@ -305,7 +305,6 @@ export class Hands {
                 type: HandCombinations.HighCard
             };
         }
-
     }
 
 }

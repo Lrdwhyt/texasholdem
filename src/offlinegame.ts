@@ -1,8 +1,8 @@
 import { OfflineMatch } from "./OfflineMatch";
 import { Player } from "./Player";
 import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
-import { Bet } from "./Bet";
-import { BetType, Betting } from "./betting";
+import { Bet, BetType } from "./Bet";
+import { Betting } from "./betting";
 import { Pot } from "./Pot";
 import { Deck } from "./Deck";
 import { Card } from "./Card";
