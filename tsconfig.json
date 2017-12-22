@@ -4,6 +4,8 @@
         "module": "es6",
         "target": "es5",
         "removeComments": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "alwaysStrict": true
     },
     "include": [

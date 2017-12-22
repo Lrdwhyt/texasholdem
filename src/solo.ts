@@ -1,7 +1,6 @@
 import { OfflineMatch } from "./OfflineMatch";
-import { AIController, Strategy } from "./AIController";
-import { OfflineGame } from "./OfflineGame";
 import { Player } from "./Player";
+import { AIController, Strategy } from "./AIController";
 import { UserController } from "./UserController";
 
 class AppController {

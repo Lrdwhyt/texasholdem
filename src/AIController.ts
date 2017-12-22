@@ -1,8 +1,7 @@
 import { Controller } from "./UserController";
 import { Player } from "./Player";
 import { Bet, BetType } from "./Bet";
-import { Betting } from "./betting";
-import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import { GameEvent, DealtHandEvent, GameStartEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
 import { Deck } from "./Deck";
 import { Card } from "./Card";
 import { Hands } from "./Hands";

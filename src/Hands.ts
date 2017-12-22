@@ -1,5 +1,4 @@
 import { Rank } from "./Rank";
-import { Suit } from "./Suit";
 import { Card } from "./Card";
 
 enum HandCombinations {

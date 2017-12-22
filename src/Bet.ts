@@ -1,5 +1,3 @@
-import { Betting } from "./betting";
-
 export enum BetType {
     Fold,
     Check,

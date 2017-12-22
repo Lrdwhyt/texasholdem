@@ -1,6 +1,6 @@
 import { OfflineGame } from "./offlinegame";
 import { Player } from "./Player";
-import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import { GameEvent, DealtHandEvent, GameEndEvent } from "./events";
 
 export class OfflineMatch {
     private players: Player[];

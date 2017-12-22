@@ -1,7 +1,6 @@
 import { UserController } from "./UserController";
 import { Player } from "./Player";
 import { Bet, BetType } from "./Bet";
-import { Betting } from "./betting";
 import { Pot } from "./Pot";
 
 export class UserView {

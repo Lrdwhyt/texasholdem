@@ -47,7 +47,6 @@ export class OfflineGame {
     private lastPlayerFlag: boolean;
 
     private bettingStage: BettingStage;
-    private button: number;
     private match: OfflineMatch;
 
     constructor(players: Player[], button: number, match: OfflineMatch, ante: number) {
@@ -83,8 +82,6 @@ export class OfflineGame {
         this.lastPlayerFlag = false;
 
         this.bettingStage = BettingStage.NONE;
-
-        this.button = button;
 
         this.init();
     }
