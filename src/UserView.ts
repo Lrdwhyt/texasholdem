@@ -5,11 +5,9 @@ import { Betting } from "./betting";
 import { Pot } from "./Pot";
 
 export class UserView {
-    root: HTMLElement;
     controller: UserController;
 
-    constructor(root: HTMLElement, controller: UserController) {
-        this.root = root;
+    constructor(controller: UserController) {
         this.controller = controller;
         this.init();
     }
@@ -52,9 +50,8 @@ export class UserView {
         let bettingButtons: HTMLCollectionOf<HTMLButtonElement> = <HTMLCollectionOf<HTMLButtonElement>>document.getElementsByClassName("bet-control");
         for (let i = 0; i < bettingButtons.length; ++i) {
             bettingButtons[i].classList.remove("prebet");
-            //this.disableBetButton(bettingButtons[i]);
+            this.disableBetButton(bettingButtons[i]);
         }
-        this.disableBetting();
     }
 
     notifyInvalidBet() {
@@ -70,10 +67,10 @@ export class UserView {
         document.getElementById("players-right").innerHTML = "";
     }
 
-    resetBetting(): void {
-        let texts = document.querySelectorAll(".text")
-        for (let i = 0; i < texts.length; ++i) {
-            texts[i].innerHTML = "";
+    resetBetStatusText(): void {
+        let betStatuses = document.querySelectorAll(".text")
+        for (let i = 0; i < betStatuses.length; ++i) {
+            betStatuses[i].textContent = "";
         };
     }
 
@@ -226,13 +223,13 @@ export class UserView {
         button.classList.add("invalid-bet");
     }
 
-    fillBetAmount2(amount: number) {
+    setBetAmount(amount: number) {
         let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
         let betAmount: number = amount;
         betInput.value = String(this.controller.constrainBetAmount(betAmount));
     }
 
-    fillBetAmount() {
+    updateBetAmount() {
         let betInput: HTMLInputElement = <HTMLInputElement>document.getElementById("bet");
         let betAmount: number = parseInt(betInput.value);
         if (!(betAmount > 0)) {
@@ -248,7 +245,7 @@ export class UserView {
         let callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("call");
         let raiseButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("raise");
 
-        this.fillBetAmount();
+        this.updateBetAmount();
 
         if (money > 0) {
             this.enableBetButton(foldButton);
@@ -281,7 +278,7 @@ export class UserView {
         document.querySelector("[name=" + playerName + "]").getElementsByClassName("money")[0].textContent = "$" + String(amount);
     }
 
-    updateTurnRemove(playerName: string): void {
+    resetPlayerTurnIndicator(playerName: string): void {
         document.querySelector("[name=" + playerName + "]").classList.remove("awaiting");
     }
 

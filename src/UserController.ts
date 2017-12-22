@@ -11,7 +11,6 @@ export interface Controller {
 export class UserController implements Controller {
     callbackFunction: (player: Player, bet: Bet) => void;
     player: Player;
-    root: HTMLElement;
     amountToCall: number;
     currentBet: number;
     amountCommitted: number;
@@ -22,9 +21,9 @@ export class UserController implements Controller {
     queuedBet: Bet;
     view: UserView;
 
-    constructor(player: Player, root: HTMLElement) {
+    constructor(player: Player) {
         this.player = player;
-        this.view = new UserView(root, this);
+        this.view = new UserView(this);
     }
 
     placeBet(bet: Bet) {
@@ -108,7 +107,7 @@ export class UserController implements Controller {
             this.minRaise = 0;
             this.amountCommitted = 0;
             this.amountToCall = 0;
-            this.view.fillBetAmount2(0);
+            this.view.setBetAmount(0);
 
         } else if (e instanceof PlayerMoneyChangeEvent) {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
@@ -149,7 +148,7 @@ export class UserController implements Controller {
 
         } else if (e instanceof BetMadeEvent) {
 
-            this.view.updateTurnRemove(e.player.getName());
+            this.view.resetPlayerTurnIndicator(e.player.getName());
             let msg: string = "[GameBetting] ";
 
             switch (e.bet.type) {
@@ -192,7 +191,7 @@ export class UserController implements Controller {
             }
             console.log("Flop dealt");
             this.hasQueuedBet = false;
-            this.view.resetBetting();
+            this.view.resetBetStatusText();
             this.view.resetBettingUI();
             this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
@@ -203,7 +202,7 @@ export class UserController implements Controller {
             }
             console.log("Turn dealt");
             this.hasQueuedBet = false;
-            this.view.resetBetting();
+            this.view.resetBetStatusText();
             this.view.resetBettingUI();
             this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
@@ -214,7 +213,7 @@ export class UserController implements Controller {
             }
             console.log("River dealt");
             this.hasQueuedBet = false;
-            this.view.resetBetting();
+            this.view.resetBetStatusText();
             this.view.resetBettingUI();
             this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
