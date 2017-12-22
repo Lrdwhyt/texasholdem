@@ -1,4 +1,7 @@
-enum BetType {
+import { Player } from "./Player";
+import { Bet } from "./Bet";
+
+export enum BetType {
     Fold,
     Check,
     Call,
@@ -6,52 +9,7 @@ enum BetType {
     AllIn
 };
 
-class Bet {
-    public type: BetType;
-    public amount: number;
-
-    constructor(type: BetType, amount?: number) {
-        this.type = type;
-        this.amount = amount;
-    }
-}
-
-class Pot {
-    public baseline: number;
-    public bets;
-    public players: Player[];
-
-    constructor() {
-        this.players = [];
-        this.bets = {};
-        this.baseline = 0;
-    }
-
-    add(player: Player, amount: number): void {
-        if (this.players.indexOf(player) === -1) {
-            this.players.push(player);
-        }
-        this.bets[player.getName()] = amount;
-    }
-
-    size(): number {
-        let size: number = 0;
-        let obj = this.bets;
-        Object.keys(this.bets).forEach(function (key) {
-            size += obj[key];
-        });
-        return size;
-    }
-
-    remove(player: Player): void {
-        let index = this.players.indexOf(player);
-        if (index >= 0) {
-            this.players.splice(index, 1);
-        }
-    }
-}
-
-class Betting {
+export class Betting {
     static isValidBet(player: Player, bet: Bet, amountToCall: number, canRaise: boolean, minRaise: number): boolean {
         switch (bet.type) {
             case BetType.Call:

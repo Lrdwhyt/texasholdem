@@ -1,11 +1,20 @@
-enum Strategy {
+import { Controller } from "./UserController";
+import { Player } from "./Player";
+import { Bet } from "./Bet";
+import { BetType, Betting } from "./betting";
+import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import { Deck } from "./Deck";
+import { Card } from "./Card";
+import { Hands } from "./Hands";
+
+export enum Strategy {
     Passive,
     Normal,
     Tricky,
     Aggressive
 }
 
-class AIController implements Controller {
+export class AIController implements Controller {
     private player: Player;
     private hand: Card[];
     private board: Card[];

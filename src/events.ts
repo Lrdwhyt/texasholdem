@@ -1,6 +1,11 @@
-interface GameEvent { }
+import { Player } from "./Player";
+import { Pot } from "./Pot";
+import { Bet } from "./Bet";
+import { Card } from "./Card";
 
-class DealtHandEvent implements GameEvent {
+export interface GameEvent { }
+
+export class DealtHandEvent implements GameEvent {
     public player: Player;
     public hand: Card[];
 
@@ -10,7 +15,7 @@ class DealtHandEvent implements GameEvent {
     }
 }
 
-class PlayerMoneyChangeEvent implements GameEvent {
+export class PlayerMoneyChangeEvent implements GameEvent {
     public player: Player;
     public change: number;
 
@@ -20,7 +25,7 @@ class PlayerMoneyChangeEvent implements GameEvent {
     }
 }
 
-class PotChangeEvent implements GameEvent {
+export class PotChangeEvent implements GameEvent {
     public pots: Pot[];
 
     constructor(pots: Pot[]) {
@@ -28,7 +33,7 @@ class PotChangeEvent implements GameEvent {
     }
 }
 
-class GameStartEvent implements GameEvent {
+export class GameStartEvent implements GameEvent {
     public players: Player[];
 
     constructor(players: Player[]) {
@@ -36,7 +41,7 @@ class GameStartEvent implements GameEvent {
     }
 }
 
-class BetAwaitEvent implements GameEvent {
+export class BetAwaitEvent implements GameEvent {
     public player: Player;
     public callback;
     public current: number;
@@ -56,7 +61,7 @@ class BetAwaitEvent implements GameEvent {
     }
 }
 
-class BetMadeEvent implements GameEvent {
+export class BetMadeEvent implements GameEvent {
     public player: Player;
     public bet: Bet;
 
@@ -66,7 +71,7 @@ class BetMadeEvent implements GameEvent {
     }
 }
 
-class DealtFlopEvent implements GameEvent {
+export class DealtFlopEvent implements GameEvent {
     public cards: Card[];
 
     constructor(cards: Card[]) {
@@ -74,7 +79,7 @@ class DealtFlopEvent implements GameEvent {
     }
 }
 
-class DealtTurnEvent implements GameEvent {
+export class DealtTurnEvent implements GameEvent {
     public cards: Card[];
 
     constructor(cards: Card[]) {
@@ -82,7 +87,7 @@ class DealtTurnEvent implements GameEvent {
     }
 }
 
-class DealtRiverEvent implements GameEvent {
+export class DealtRiverEvent implements GameEvent {
     public cards: Card[];
 
     constructor(cards: Card[]) {
@@ -90,7 +95,7 @@ class DealtRiverEvent implements GameEvent {
     }
 }
 
-class GameEndEvent implements GameEvent {
+export class GameEndEvent implements GameEvent {
     public result;
     public moneyChange: { [name: string]: number };
 

@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
         "outDir": "./js",
+        "module": "es6",
         "target": "es5",
+        "removeComments": true,
         "alwaysStrict": true
     },
     "include": [
