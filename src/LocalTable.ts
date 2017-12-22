@@ -1,11 +1,11 @@
-import { OfflineGame } from "./offlinegame";
+import { LocalRound } from "./LocalRound";
 import { Player } from "./Player";
 import { GameEvent, DealtHandEvent, GameEndEvent } from "./events";
 
-export class OfflineMatch {
+export class LocalTable {
     private players: Player[];
     private people: Player[];
-    private game: OfflineGame;
+    private game: LocalRound;
     private buttonPosition: number;
     private hands: number;
 
@@ -45,7 +45,7 @@ export class OfflineMatch {
                 this.buttonPosition = 0;
             }
             ++this.hands;
-            this.game = new OfflineGame(this.players, this.buttonPosition, this, 50 * Math.pow(2, Math.floor(this.hands / 6)));
+            this.game = new LocalRound(this.players, this.buttonPosition, this, 50 * Math.pow(2, Math.floor(this.hands / 6)));
         }
     }
 

@@ -14,4 +14,9 @@ export class Bet {
         this.type = type;
         this.amount = amount;
     }
+
+    isValid(canRaise) {
+
+    }
+
 }

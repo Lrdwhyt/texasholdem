@@ -1,21 +1,11 @@
 import { Rank } from "./Rank";
 import { Card } from "./Card";
+import { HandType } from "./HandType";
+import { HandEvaluation } from "./HandEvaluation";
 
-enum HandCombinations {
-    HighCard,
-    OnePair,
-    TwoPair,
-    ThreeOfAKind,
-    Straight,
-    Flush,
-    FullHouse,
-    FourOfAKind,
-    StraightFlush
-}
+export class HandUtils {
 
-export class Hands {
-
-    public static difference(set: any[], subset: any[]): any[] {
+    public static difference<T>(set: T[], subset: T[]): T[] {
         let result = set.slice(0);
         for (let item of subset) {
             result.splice(result.indexOf(item), 1);
@@ -23,17 +13,19 @@ export class Hands {
         return result;
     }
 
-    static sort(cards: Card[], isAceLow?: boolean): Card[] {
+    static sort(cards: Card[]): Card[] {
         let results: Card[] = cards.slice(0);
-        if (isAceLow === true) {
-            results.sort(function (a, b) {
-                return a.rank.valueAceLow() - b.rank.valueAceLow();
-            });
-        } else {
-            results.sort(function (a, b) {
-                return a.rank.value() - b.rank.value();
-            });
-        }
+        results.sort(function (a, b) {
+            return a.rank.value() - b.rank.value();
+        });
+        return results;
+    }
+
+    static sortWithAceLow(cards: Card[]): Card[] {
+        let results: Card[] = cards.slice(0);
+        results.sort(function (a, b) {
+            return a.rank.valueAceLow() - b.rank.valueAceLow();
+        });
         return results;
     }
 
@@ -62,7 +54,7 @@ export class Hands {
         return result;
     }
 
-    static groupByRank(cards: Card[]) {
+    static groupByRank(cards: Card[]): Card[][] {
         let results = [];
         let sorted = this.sort(cards);
         let currentIndex: number = 0;
@@ -84,7 +76,7 @@ export class Hands {
         return results;
     }
 
-    static groupBySuit(cards: Card[]) {
+    static groupBySuit(cards: Card[]): Card[][] {
         let results = [];
         cards = this.sortBySuit(cards);
         let currentIndex: number = 0;
@@ -145,7 +137,7 @@ export class Hands {
             return hand;
         }
         hand = [];
-        sorted = this.sort(cards, true);
+        sorted = this.sortWithAceLow(cards);
         currentRank = null;
         for (let card of sorted) {
             if (currentRank === undefined || currentRank === null) {
@@ -175,8 +167,9 @@ export class Hands {
         }
     }
 
-    public static bestHand(cards: Card[]) {
-        let hand: Card[] = [];
+    public static bestHand(hand: Card[], board: Card[]): HandEvaluation {
+        let cards: Card[] = hand.concat(board);
+        let bestHand: Card[] = [];
         let score: number;
 
         let mostCommonSuits = this.groupBySuit(cards);
@@ -189,32 +182,24 @@ export class Hands {
             if (ls.length >= 5) {
                 let highestCard: Card = this.getHighestCard(ls);
                 let secondHighestCard: Card = this.getHighestCard(this.difference(ls, [highestCard]));
-                if (highestCard.rank === Rank.Ace && secondHighestCard.rank !== Rank.King) {
-                    ls = this.sort(ls, true);
-                    hand = ls.slice(-5);
+                if (highestCard.rank === Rank.Ace && secondHighestCard.rank !== Rank.King) { // Ace low straight
+                    ls = this.sortWithAceLow(ls);
+                    bestHand = ls.slice(-5);
                     score = 8 * Math.pow(14, 5) + secondHighestCard.rank.value();
                 } else {
-                    hand = this.getNHighestCards(ls, 5);
+                    bestHand = this.getNHighestCards(ls, 5);
                     score = 8 * Math.pow(14, 5) + highestCard.rank.value();
                 }
-                return {
-                    hand: hand,
-                    score: score,
-                    type: HandCombinations.StraightFlush
-                };
+                return new HandEvaluation(hand, bestHand, score, HandType.StraightFlush);
             }
         }
 
         if (mostCommonRanks[0].length === 4) { // Four of a kind
             let quad: Card[] = mostCommonRanks[0];
             let kicker: Card[] = this.getNHighestCards(this.difference(cards, quad), 1);
-            hand = quad.concat(kicker);
+            bestHand = quad.concat(kicker);
             score = 7 * Math.pow(14, 5) + quad[0].rank.value() * 14 + kicker[0].rank.value();
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.FourOfAKind
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.FourOfAKind);
         } else if (mostCommonRanks[0].length === 3 && mostCommonRanks[1].length >= 2) { // Full house
             let triple: Card[] = mostCommonRanks[0];
             let pair: Card[];
@@ -223,47 +208,31 @@ export class Hands {
             } else {
                 pair = mostCommonRanks[1].slice(0, 2);
             }
-            hand = triple.concat(pair);
+            bestHand = triple.concat(pair);
             score = 6 * Math.pow(14, 5) + triple[0].rank.value() * 14 + pair[0].rank.value();
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.FullHouse
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.FullHouse);
         } else if (largestSuit.length >= 5) { // Flush
-            hand = this.getNHighestCards(largestSuit, 5);
-            score = 5 * Math.pow(14, 5) + this.getScore(hand);
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.Flush
-            };
+            bestHand = this.getNHighestCards(largestSuit, 5);
+            score = 5 * Math.pow(14, 5) + this.getScore(bestHand);
+            return new HandEvaluation(hand, bestHand, score, HandType.Flush);
         } else if (longestStraight.length >= 5) { // Straight
             let highestCard = this.getHighestCard(longestStraight);
             let secondHighestCard = this.getHighestCard(this.difference(longestStraight, [highestCard]));
             if (highestCard.rank === Rank.Ace && secondHighestCard.rank !== Rank.King) {
-                longestStraight = this.sort(longestStraight, true);
-                hand = longestStraight.slice(-5);
+                longestStraight = this.sortWithAceLow(longestStraight);
+                bestHand = longestStraight.slice(-5);
                 score = 4 * Math.pow(14, 5) + secondHighestCard.rank.value();
             } else {
-                hand = this.getNHighestCards(longestStraight, 5);
+                bestHand = this.getNHighestCards(longestStraight, 5);
                 score = 4 * Math.pow(14, 5) + highestCard.rank.value();
             }
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.Straight
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.Straight);
         } else if (mostCommonRanks[0].length === 3) { // Three of a kind
             let triple = mostCommonRanks[0];
             let kickers = this.getNHighestCards(this.difference(cards, triple), 2);
-            hand = triple.concat(kickers);
+            bestHand = triple.concat(kickers);
             score = 3 * Math.pow(14, 5) + triple[0].rank.value() * Math.pow(14, 3) + this.getScore(kickers);
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.ThreeOfAKind
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.ThreeOfAKind);
         } else if (mostCommonRanks[0].length === 2 && mostCommonRanks[1].length === 2) { // Two pair
             let highPair;
             let lowPair;
@@ -275,34 +244,22 @@ export class Hands {
                 highPair = mostCommonRanks[1];
                 lowPair = mostCommonRanks[0];
             }
-            hand = highPair.concat(lowPair);
-            let remainder = this.difference(cards, hand);
+            bestHand = highPair.concat(lowPair);
+            let remainder = this.difference(cards, bestHand);
             let kicker = this.getHighestCard(remainder)
-            hand.push(kicker);
+            bestHand.push(kicker);
             score = 2 * Math.pow(14, 5) + highPair[0].rank.value() * Math.pow(14, 2) + lowPair[0].rank.value() * Math.pow(14, 1) + kicker.rank.value();
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.TwoPair
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.TwoPair);
         } else if (mostCommonRanks[0].length === 2) { // One pair
             let pair = mostCommonRanks[0];
             let kickers = this.getNHighestCards(this.difference(cards, pair), 3);
-            hand = pair.concat(kickers);
+            bestHand = pair.concat(kickers);
             score = Math.pow(14, 5) + pair[0].rank.value() * Math.pow(14, 3) + this.getScore(kickers);
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.OnePair
-            };
+            return new HandEvaluation(hand, bestHand, score, HandType.OnePair);
         } else { // High card
-            hand = this.getNHighestCards(cards, 5);
-            score = this.getScore(hand);
-            return {
-                hand: hand,
-                score: score,
-                type: HandCombinations.HighCard
-            };
+            bestHand = this.getNHighestCards(cards, 5);
+            score = this.getScore(bestHand);
+            return new HandEvaluation(hand, bestHand, score, HandType.HighCard);
         }
     }
 

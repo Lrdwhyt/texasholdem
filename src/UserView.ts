@@ -4,7 +4,7 @@ import { Bet, BetType } from "./Bet";
 import { Pot } from "./Pot";
 
 export class UserView {
-    controller: UserController;
+    private controller: UserController;
 
     constructor(controller: UserController) {
         this.controller = controller;
@@ -53,7 +53,7 @@ export class UserView {
         }
     }
 
-    notifyInvalidBet() {
+    notifyInvalidBet(): void {
         alert("Invalid bet!");
     }
 

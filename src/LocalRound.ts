@@ -1,4 +1,4 @@
-import { OfflineMatch } from "./OfflineMatch";
+import { LocalTable } from "./LocalTable";
 import { Player } from "./Player";
 import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
 import { Bet, BetType } from "./Bet";
@@ -6,18 +6,10 @@ import { Betting } from "./betting";
 import { Pot } from "./Pot";
 import { Deck } from "./Deck";
 import { Card } from "./Card";
-import { Hands } from "./Hands";
+import { HandUtils } from "./Hands";
+import { BettingStage } from "./BettingStage";
 
-enum BettingStage {
-    NONE,
-    PREFLOP,
-    FLOP,
-    TURN,
-    RIVER,
-    COMPLETE
-};
-
-export class OfflineGame {
+export class LocalRound {
     private players: Player[];
     private bettingPlayers: Player[];
     private unfoldedPlayers: Player[];
@@ -27,10 +19,10 @@ export class OfflineGame {
     private turn: Card[];
     private river: Card[];
 
-    private bets: { [name: string]: number };
+    private playerBets: { [name: string]: number };
     private baselines: number[];
     private pots: Pot[];
-    private initialMoney: { [name: string]: number };
+    private initialMoney: { [name: string]: number }; // Used to track money change at end of game
 
     private ante: number;
     private smallBlind: number;
@@ -44,12 +36,12 @@ export class OfflineGame {
     private lastRaiser: Player;
 
     private canRaise: boolean;
-    private lastPlayerFlag: boolean;
+    private reachedLastPlayer: boolean;
 
     private bettingStage: BettingStage;
-    private match: OfflineMatch;
+    private match: LocalTable;
 
-    constructor(players: Player[], button: number, match: OfflineMatch, ante: number) {
+    constructor(players: Player[], button: number, match: LocalTable, ante: number) {
         this.match = match;
 
         this.players = players.slice(0);
@@ -62,7 +54,7 @@ export class OfflineGame {
         this.turn = [];
         this.river = [];
 
-        this.bets = {};
+        this.playerBets = {};
         this.baselines = [];
         this.pots = [new Pot()];
         this.initialMoney = {};
@@ -79,7 +71,7 @@ export class OfflineGame {
         this.lastRaiser = null;
 
         this.canRaise = true;
-        this.lastPlayerFlag = false;
+        this.reachedLastPlayer = false;
 
         this.bettingStage = BettingStage.NONE;
 
@@ -88,7 +80,7 @@ export class OfflineGame {
 
     init(): void {
         for (let player of this.players) {
-            this.bets[player.getName()] = 0;
+            this.playerBets[player.getName()] = 0;
             this.initialMoney[player.getName()] = player.getMoney();
             player.resetHand();
         }
@@ -109,7 +101,7 @@ export class OfflineGame {
         }
 
         this.bettingStage = BettingStage.PREFLOP;
-        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
+        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.playerBets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
     }
 
     dispatchEvent(e: GameEvent) {
@@ -133,16 +125,16 @@ export class OfflineGame {
     deductAntes(ante: number): void {
         for (let player of this.players) {
             if (player.getMoney() >= ante) {
-                this.bets[player.getName()] += ante;
+                this.playerBets[player.getName()] += ante;
                 this.modMoney(player, -ante);
                 if (player.getMoney() === 0) {
-                    this.addBaseline(this.bets[player.getName()]);
+                    this.addBaseline(this.playerBets[player.getName()]);
                     this.removeFromBetting(player);
                 }
             } else { // Not enough money to cover ante
-                this.bets[player.getName()] += player.getMoney();
+                this.playerBets[player.getName()] += player.getMoney();
                 this.modMoney(player, -player.getMoney());
-                this.addBaseline(this.bets[player.getName()]);
+                this.addBaseline(this.playerBets[player.getName()]);
                 this.removeFromBetting(player);
             }
         }
@@ -150,16 +142,16 @@ export class OfflineGame {
 
     deductBlind(player: Player, amount: number) {
         if (player.getMoney() >= amount) {
-            this.bets[player.getName()] += amount;
+            this.playerBets[player.getName()] += amount;
             this.modMoney(player, -amount);
             if (player.getMoney() === 0) {
-                this.addBaseline(this.bets[player.getName()]);
+                this.addBaseline(this.playerBets[player.getName()]);
                 this.removeFromBetting(player);
             }
         } else { // Not enough money to cover blind
-            this.bets[player.getName()] += player.getMoney();
+            this.playerBets[player.getName()] += player.getMoney();
             this.modMoney(player, -player.getMoney());
-            this.addBaseline(this.bets[player.getName()]);
+            this.addBaseline(this.playerBets[player.getName()]);
             this.removeFromBetting(player);
         }
     }
@@ -184,12 +176,12 @@ export class OfflineGame {
     }
 
     getEligiblePot = (player: Player, amount: number): number => {
-        let totalBet: number = this.bets[player.getName()] + amount;
+        let totalBet: number = this.playerBets[player.getName()] + amount;
         let pot: number = totalBet;
-        for (let p in this.bets) {
+        for (let p in this.playerBets) {
             if (p !== player.getName()) {
-                if (totalBet > this.bets[p]) {
-                    pot += this.bets[p];
+                if (totalBet > this.playerBets[p]) {
+                    pot += this.playerBets[p];
                 } else {
                     pot += totalBet;
                 }
@@ -220,7 +212,7 @@ export class OfflineGame {
         this.updatePots(); // Redistribute pots
     }
 
-    processPot(pot: Pot) {
+    awardPots(pot: Pot): { [playerName: string]: any } {
         if (pot.players.length === 1) { // Only one player eligible for pot, who automatically wins it.
             this.modMoney(pot.players[0], pot.size());
             return {
@@ -231,8 +223,9 @@ export class OfflineGame {
         let results = {};
         let winners: Player[] = [];
         let bestScore: number = 0;
+        let board: Card[] = this.flop.concat(this.turn).concat(this.river);
         for (let player of pot.players) {
-            let playerHand = Hands.bestHand(player.getHand().concat(this.flop).concat(this.turn).concat(this.river));
+            let playerHand = HandUtils.bestHand(player.getHand(), board);
             let playerScore: number = playerHand.score;
             results[player.getName()] = {
                 player: player.getName(),
@@ -261,9 +254,9 @@ export class OfflineGame {
     updatePots(): void { // Distribute players and their bets according to pot baselines
         for (let player of this.players) {
             if (this.pots.length === 1) { // No side pots
-                this.pots[0].add(player, this.bets[player.getName()]);
+                this.pots[0].add(player, this.playerBets[player.getName()]);
             } else {
-                let totalToBet = this.bets[player.getName()];
+                let totalToBet = this.playerBets[player.getName()];
                 for (let pot of this.pots) {
                     if (pot.baseline < totalToBet && pot.baseline !== 0) {
                         pot.add(player, pot.baseline);
@@ -296,25 +289,25 @@ export class OfflineGame {
         let index = this.bettingPlayers.indexOf(player);
         if (index !== -1) {
             this.bettingPlayers.splice(index, 1);
-            if (this.bettingPlayers.length === 1 && this.bets[this.bettingPlayers[0].getName()] === this.currentBet) {
+            if (this.bettingPlayers.length === 1 && this.playerBets[this.bettingPlayers[0].getName()] === this.currentBet) {
                 this.bettingPlayers.pop();
             }
         }
     }
 
     processBet(player: Player, bet: Bet): void {
-        let amountToCall: number = this.currentBet - this.bets[player.getName()];
+        let amountToCall: number = this.currentBet - this.playerBets[player.getName()];
         switch (bet.type) {
             case BetType.Call:
                 if (player.getMoney() > amountToCall) {
-                    this.bets[player.getName()] += amountToCall;
+                    this.playerBets[player.getName()] += amountToCall;
                     this.modMoney(player, -amountToCall);
                 } else { // Player is all-in
-                    this.bets[player.getName()] += player.getMoney();
+                    this.playerBets[player.getName()] += player.getMoney();
                     this.modMoney(player, -player.getMoney());
-                    this.addBaseline(this.bets[player.getName()]);
+                    this.addBaseline(this.playerBets[player.getName()]);
                     if (player === this.lastPlayer) {
-                        this.lastPlayerFlag = true;
+                        this.reachedLastPlayer = true;
                     }
                     this.removeFromBetting(player);
                 }
@@ -331,11 +324,11 @@ export class OfflineGame {
                 }
                 this.lastPlayer = this.getPrevPlayer(player);
                 this.currentBet += bet.amount - amountToCall;
-                this.bets[player.getName()] += bet.amount;
+                this.playerBets[player.getName()] += bet.amount;
                 if (bet.amount === player.getMoney()) { // Player raises to all-in
-                    this.addBaseline(this.bets[player.getName()]);
+                    this.addBaseline(this.playerBets[player.getName()]);
                     if (player === this.lastPlayer) {
-                        this.lastPlayerFlag = true;
+                        this.reachedLastPlayer = true;
                     }
                     this.removeFromBetting(player);
                 }
@@ -343,11 +336,11 @@ export class OfflineGame {
                 break;
 
             case BetType.Fold:
-                if (this.firstPlayer === player) {
+                if (player === this.firstPlayer) {
                     this.firstPlayer = this.getNextPlayer(player);
                 }
                 if (player === this.lastPlayer) {
-                    this.lastPlayerFlag = true;
+                    this.reachedLastPlayer = true;
                 }
                 this.removeFromBetting(player);
                 this.unfoldedPlayers.splice(this.unfoldedPlayers.indexOf(player), 1);
@@ -359,7 +352,7 @@ export class OfflineGame {
     }
 
     dealFlop(): void {
-        this.deck.pop();
+        this.deck.pop(); // Burn card
         this.flop.push(this.deck.deal());
         this.flop.push(this.deck.deal());
         this.flop.push(this.deck.deal());
@@ -379,12 +372,12 @@ export class OfflineGame {
     }
 
     finish(): void {
-        let result = null;
+        let result;
         for (let index in this.pots) {
             if (index === "0") {
-                result = this.processPot(this.pots[index]);
+                result = this.awardPots(this.pots[index]);
             } else {
-                this.processPot(this.pots[index]);
+                this.awardPots(this.pots[index]);
             }
         }
         let moneyChange = {};
@@ -394,7 +387,7 @@ export class OfflineGame {
         this.dispatchEvent(new GameEndEvent(result, moneyChange));
     }
 
-    finishToEnd(): void {
+    doShowdown(): void {
         if (this.bettingStage !== BettingStage.RIVER) {
             switch (this.bettingStage) {
                 case BettingStage.PREFLOP:
@@ -405,12 +398,12 @@ export class OfflineGame {
                     this.dealRiver();
             }
         }
-        let result = null;
+        let result;
         for (let index in this.pots) {
             if (index === "0") {
-                result = this.processPot(this.pots[index]);
+                result = this.awardPots(this.pots[index]);
             } else {
-                this.processPot(this.pots[index]);
+                this.awardPots(this.pots[index]);
             }
         }
         let moneyChange = {};
@@ -424,7 +417,7 @@ export class OfflineGame {
         if (this.currentPlayer !== player) {
             return; // Not player's turn to bet
         }
-        let amountToCall: number = this.currentBet - this.bets[player.getName()];
+        let amountToCall: number = this.currentBet - this.playerBets[player.getName()];
         if (Betting.isValidBet(player, bet, amountToCall, this.canRaise, this.minRaise) === false) {
             console.log("[GameBug] " + player.getName() + " made an invalid bet: " + bet.type + ", " + bet.amount);
             return; // Not a valid bet
@@ -442,14 +435,14 @@ export class OfflineGame {
         if (this.unfoldedPlayers.length === 1) { // Last player wins by default
             this.finish();
             return;
-        } else if (this.bettingPlayers.length === 0 || this.bettingPlayers.length === 1 && this.currentBet === this.bets[this.bettingPlayers[0].getName()]) {
+        } else if (this.bettingPlayers.length === 0 || this.bettingPlayers.length === 1 && this.currentBet === this.playerBets[this.bettingPlayers[0].getName()]) {
             // Only one player or no players left betting, so no need to continue betting
-            this.finishToEnd();
+            this.doShowdown();
             return;
         }
 
-        if (player === this.lastPlayer || this.lastPlayerFlag === true) {
-            this.lastPlayerFlag = false;
+        if (player === this.lastPlayer || this.reachedLastPlayer === true) {
+            this.reachedLastPlayer = false;
             switch (this.bettingStage) {
                 case BettingStage.PREFLOP:
                     this.dealFlop();
@@ -480,12 +473,12 @@ export class OfflineGame {
 
                 case BettingStage.RIVER:
                     this.bettingStage = BettingStage.COMPLETE;
-                    this.finishToEnd();
+                    this.doShowdown();
                     break;
             }
         }
         if (this.bettingStage !== BettingStage.COMPLETE) {
-            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.bets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
+            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.playerBets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
         }
     }
 

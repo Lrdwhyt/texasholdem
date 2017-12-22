@@ -4,7 +4,7 @@ import { Bet, BetType } from "./Bet";
 import { GameEvent, DealtHandEvent, GameStartEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
 import { Deck } from "./Deck";
 import { Card } from "./Card";
-import { Hands } from "./Hands";
+import { HandUtils } from "./Hands";
 
 export enum Strategy {
     Passive,
@@ -28,7 +28,7 @@ export class AIController implements Controller {
         this.unfoldedPlayers = [];
     }
 
-    calculateBet(cards: Card[], board: Card[], currentBet: number, committed: number, minRaise: number, money: number, potCheck: (player: Player, amount: number) => number): Bet {
+    calculateBet(cards: Card[], board: Card[], currentBet: number, amountCommitted: number, minRaise: number, playerMoney: number, potCheck: (player: Player, amount: number) => number): Bet {
 
         let deck: Deck = new Deck();
 
@@ -40,22 +40,21 @@ export class AIController implements Controller {
 
         for (let i = 0; i < trials; ++i) {
             deck.shuffle();
-            let possibleDraws: Card[] = Hands.difference(deck.getCards(), cards.concat(board));
+            let possibleDraws: Card[] = HandUtils.difference(deck.getCards(), cards.concat(board));
             let possibleBoard: Card[] = board;
             while (possibleBoard.length < 5) {
                 possibleBoard.push(possibleDraws.pop());
             }
 
-            let possibleCards: Card[] = cards.concat(possibleBoard);
             let bestScore = 0;
             for (let j = 0; j < this.unfoldedPlayers.length; ++j) { // Separate hand for each other player
                 let hypotheticalHand = [possibleDraws.pop(), possibleDraws.pop()];
-                let hypotheticalResult = Hands.bestHand(hypotheticalHand.concat(possibleBoard));
+                let hypotheticalResult = HandUtils.bestHand(hypotheticalHand, possibleBoard);
                 if (hypotheticalResult.score > bestScore) {
                     bestScore = hypotheticalResult.score;
                 }
             }
-            let bestHand = Hands.bestHand(possibleCards);
+            let bestHand = HandUtils.bestHand(cards, possibleBoard);
             if (bestHand.score > bestScore) {
                 ++totalWins;
             } else if (bestHand.score === bestScore) {
@@ -68,18 +67,18 @@ export class AIController implements Controller {
         let winRatio = totalWins / trials;
         let lossRatio = totalLosses / trials;
 
-        let amountToCall = currentBet - committed;
-        let amountToRaise = currentBet - committed + minRaise;
-        if (amountToRaise > money && money > amountToCall) {
-            amountToRaise = money;
+        let amountToCall = currentBet - amountCommitted;
+        let amountToRaise = currentBet - amountCommitted + minRaise;
+        if (amountToRaise > playerMoney && playerMoney > amountToCall) {
+            amountToRaise = playerMoney;
         }
 
         let potOdds = amountToCall / potCheck(this.player, amountToCall);
         console.log("[AIDecision] " + this.player.getName() + "/ Pot odds: " + potOdds + ", win ratio: " + winRatio);
 
         if (winRatio === 1) {
-            if (money > amountToCall) {
-                return new Bet(BetType.Raise, money);
+            if (playerMoney > amountToCall) {
+                return new Bet(BetType.Raise, playerMoney);
             } else {
                 return new Bet(BetType.Call);
             }
@@ -91,9 +90,9 @@ export class AIController implements Controller {
                     if (winRatio <= 0.5) {
                         return new Bet(BetType.Check);
                     } else {
-                        if (money >= amountToRaise) {
+                        if (playerMoney >= amountToRaise) {
                             for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                if (money >= raise * 2 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
+                                if (playerMoney >= raise * 2 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
                                     return new Bet(BetType.Raise, raise);
                                 }
                             }
@@ -111,9 +110,9 @@ export class AIController implements Controller {
                         }
                     } else if (winRatio <= 0.8) {
                         if (potOdds * 1.0 <= winRatio) {
-                            if (money >= amountToRaise) {
+                            if (playerMoney >= amountToRaise) {
                                 for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                    if (money >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
+                                    if (playerMoney >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
                                         return new Bet(BetType.Raise, raise);
                                     }
                                 }
@@ -126,9 +125,9 @@ export class AIController implements Controller {
                         }
                     } else {
                         if (potOdds * 1.0 <= winRatio) {
-                            if (money >= amountToRaise) {
+                            if (playerMoney >= amountToRaise) {
                                 for (let raise = amountToRaise * 12; raise >= amountToRaise; raise -= amountToRaise) {
-                                    if (money >= raise && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
+                                    if (playerMoney >= raise && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
                                         return new Bet(BetType.Raise, raise);
                                     }
                                 }
@@ -147,9 +146,9 @@ export class AIController implements Controller {
                     if (winRatio <= 0.6) {
                         return new Bet(BetType.Check);
                     } else {
-                        if (money >= amountToRaise) {
+                        if (playerMoney >= amountToRaise) {
                             for (let raise = amountToRaise * 4; raise >= amountToRaise; raise -= amountToRaise) {
-                                if (money >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
+                                if (playerMoney >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
                                     return new Bet(BetType.Raise, raise);
                                 }
                             }
@@ -172,10 +171,10 @@ export class AIController implements Controller {
                             return new Bet(BetType.Fold);
                         }
                     } else {
-                        if (potOdds * 2 <= winRatio) {
-                            if (money >= amountToRaise) {
+                        if (potOdds * 1.5 <= winRatio) {
+                            if (playerMoney >= amountToRaise) {
                                 for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                    if (money >= raise * 2 && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
+                                    if (playerMoney >= raise * 2 && raise / potCheck(this.player, raise) * 1.5 <= winRatio) {
                                         return new Bet(BetType.Raise, raise);
                                     }
                                 }
@@ -194,9 +193,9 @@ export class AIController implements Controller {
                     if (winRatio <= 0.7) {
                         return new Bet(BetType.Check);
                     } else {
-                        if (money >= amountToRaise) {
+                        if (playerMoney >= amountToRaise) {
                             for (let raise = amountToRaise * 4; raise >= amountToRaise; raise -= amountToRaise) {
-                                if (money >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
+                                if (playerMoney >= raise * 4 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
                                     return new Bet(BetType.Raise, raise);
                                 }
                             }
@@ -207,22 +206,22 @@ export class AIController implements Controller {
                     }
                 } else {
                     if (winRatio <= 0.5) {
-                        if (potOdds * 2.5 <= winRatio) {
+                        if (potOdds * 2 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
                         }
                     } else if (winRatio <= 0.8) {
-                        if (potOdds * 2.5 <= winRatio) {
+                        if (potOdds * 2 <= winRatio) {
                             return new Bet(BetType.Call);
                         } else {
                             return new Bet(BetType.Fold);
                         }
                     } else {
-                        if (potOdds * 2.5 <= winRatio) {
-                            if (money >= amountToRaise) {
+                        if (potOdds * 1.5 <= winRatio) {
+                            if (playerMoney >= amountToRaise) {
                                 for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                    if (money >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
+                                    if (playerMoney >= raise * 2 && raise / potCheck(this.player, raise) * 2 <= winRatio) {
                                         return new Bet(BetType.Raise, raise);
                                     }
                                 }
@@ -241,9 +240,9 @@ export class AIController implements Controller {
                     if (winRatio <= 0.5) {
                         return new Bet(BetType.Check);
                     } else {
-                        if (money >= amountToRaise) {
+                        if (playerMoney >= amountToRaise) {
                             for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                if (money >= raise * 3 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
+                                if (playerMoney >= raise * 3 && raise / potCheck(this.player, raise) * 3 <= winRatio) {
                                     return new Bet(BetType.Raise, raise);
                                 }
                             }
@@ -266,10 +265,10 @@ export class AIController implements Controller {
                             return new Bet(BetType.Fold);
                         }
                     } else {
-                        if (potOdds * 2 <= winRatio) {
-                            if (money >= amountToRaise) {
+                        if (potOdds * 1.5 <= winRatio) {
+                            if (playerMoney >= amountToRaise) {
                                 for (let raise = amountToRaise * 8; raise >= amountToRaise; raise -= amountToRaise) {
-                                    if (money >= raise && raise / potCheck(this.player, raise) * 2 <= winRatio) {
+                                    if (playerMoney >= raise && raise / potCheck(this.player, raise) * 2 <= winRatio) {
                                         return new Bet(BetType.Raise, raise);
                                     }
                                 }

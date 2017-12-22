@@ -9,17 +9,17 @@ export interface Controller {
 }
 
 export class UserController implements Controller {
-    callbackFunction: (player: Player, bet: Bet) => void;
-    player: Player;
-    amountToCall: number;
-    currentBet: number;
-    amountCommitted: number;
-    canRaise: boolean;
-    minRaise: number;
-    hasQueuedBet: boolean;
-    isTurnToBet: boolean;
-    queuedBet: Bet;
-    view: UserView;
+    private callbackFunction: (player: Player, bet: Bet) => void;
+    private player: Player;
+    private amountToCall: number;
+    private currentBet: number;
+    private amountCommitted: number;
+    private canRaise: boolean;
+    private minRaise: number;
+    private hasQueuedBet: boolean;
+    private isTurnToBet: boolean;
+    private queuedBet: Bet;
+    private view: UserView;
 
     constructor(player: Player) {
         this.player = player;
