@@ -1,4 +1,4 @@
-export class OfflineMatchView {
+export class LocalTableView {
 
     constructor() {
         this.init();

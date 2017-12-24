@@ -487,4 +487,7 @@ export class LocalRound {
         // Prevent further bets
     }
 
+    getCurrentStage() { }
+    getAllEvents(player: Player) { }
+
 }

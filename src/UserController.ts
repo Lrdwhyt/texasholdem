@@ -113,6 +113,11 @@ export class UserController implements Controller {
             this.view.updatePlayerMoney(e.player.getName(), e.player.getMoney());
             console.log("[GameEvent] " + e.player.getName() + " money changed: " + e.change);
 
+            if (e.player === this.player) {
+                this.amountCommitted -= e.change;
+                this.amountToCall = this.currentBet - this.amountCommitted;
+            }
+
         } else if (e instanceof DealtHandEvent) {
 
             for (let card of e.hand) {

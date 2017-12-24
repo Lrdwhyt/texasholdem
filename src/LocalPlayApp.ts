@@ -1,5 +1,5 @@
 import { LocalTable } from "./LocalTable";
-import { OfflineMatchView } from "./OfflineMatchView";
+import { LocalTableView } from "./LocalTableView";
 import { Player } from "./Player";
 import { AIController, Strategy } from "./AIController";
 import { UserController } from "./UserController";
@@ -7,10 +7,10 @@ import { UserController } from "./UserController";
 export class LocalPlayApp {
 
     private table: LocalTable;
-    private view: OfflineMatchView;
+    private view: LocalTableView;
 
     init() {
-        this.view = new OfflineMatchView();
+        this.view = new LocalTableView();
         this.newTable();
         document.getElementById("next-match").addEventListener("click", () => {
             this.newTable();
