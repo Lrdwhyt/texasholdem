@@ -1,11 +1,12 @@
+import { Round } from "./Round";
 import { LocalRound } from "./LocalRound";
 import { Player } from "./Player";
-import { GameEvent, DealtHandEvent, GameEndEvent } from "./events";
+import { GameEvent, DealtHandEvent, RoundEndEvent } from "./events";
 
 export class LocalTable {
     private players: Player[];
     private people: Player[];
-    private game: LocalRound;
+    private game: Round;
     private buttonPosition: number;
     private hands: number;
 
@@ -27,7 +28,7 @@ export class LocalTable {
         for (let player of this.people) {
             player.getController().dispatchEvent(e);
         }
-        if (e instanceof GameEndEvent) {
+        if (e instanceof RoundEndEvent) {
             this.game = undefined;
         }
     }
@@ -50,9 +51,9 @@ export class LocalTable {
     }
 
     finish() {
-        if (this.game !== null && this.game !== undefined) {
-            this.game.terminate();
-            this.game = null;
+        if (this.game !== undefined) {
+            this.game.finish();
+            this.game = undefined;
         }
     }
 }

@@ -1,16 +1,17 @@
 import { UserView } from "./UserView";
 import { Player } from "./Player";
-import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, RoundStartEvent, RoundEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
 import { Bet, BetType } from "./Bet";
 import { Betting } from "./betting";
+import { Round } from "./Round";
 
 export interface Controller {
     dispatchEvent(e: GameEvent): void;
 }
 
 export class UserController implements Controller {
-    private callbackFunction: (player: Player, bet: Bet) => void;
     private player: Player;
+    private currentRound: Round | undefined;
     private amountToCall: number;
     private currentBet: number;
     private amountCommitted: number;
@@ -82,7 +83,7 @@ export class UserController implements Controller {
             if (bet.type === BetType.Fold) {
                 this.view.disableBetting();
             }
-            this.callbackFunction(this.player, bet);
+            this.currentRound.handleBet(this.player, bet);
         } else {
             this.view.notifyInvalidBet();
         }
@@ -90,7 +91,8 @@ export class UserController implements Controller {
 
     dispatchEvent(e: GameEvent): void {
 
-        if (e instanceof GameStartEvent) {
+        if (e instanceof RoundStartEvent) {
+            this.currentRound = e.round;
             console.log("Game started");
             this.view.resetUI();
             let otherPlayers = e.players.slice(0);
@@ -130,7 +132,6 @@ export class UserController implements Controller {
 
             if (e.player === this.player) {
                 console.log("Your turn!");
-                this.callbackFunction = e.callback;
                 this.amountToCall = e.current - e.committed;
                 this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
@@ -222,7 +223,7 @@ export class UserController implements Controller {
             this.view.resetBettingUI();
             this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
 
-        } else if (e instanceof GameEndEvent) {
+        } else if (e instanceof RoundEndEvent) {
             this.view.resetBettingUI();
             if (e.result) {
                 for (let playerName in e.moneyChange) {

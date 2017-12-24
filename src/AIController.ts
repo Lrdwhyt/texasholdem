@@ -1,10 +1,11 @@
 import { Controller } from "./UserController";
 import { Player } from "./Player";
 import { Bet, BetType } from "./Bet";
-import { GameEvent, DealtHandEvent, GameStartEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import { GameEvent, DealtHandEvent, RoundStartEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
 import { Deck } from "./Deck";
 import { Card } from "./Card";
 import { HandUtils } from "./Hands";
+import { Round } from "./Round";
 
 export enum Strategy {
     Passive,
@@ -15,6 +16,7 @@ export enum Strategy {
 
 export class AIController implements Controller {
     private player: Player;
+    private currentRound: Round;
     private hand: Card[];
     private board: Card[];
     private strategy: Strategy;
@@ -288,7 +290,8 @@ export class AIController implements Controller {
 
     //Allows game to notify player of events
     dispatchEvent(e: GameEvent): void {
-        if (e instanceof GameStartEvent) {
+        if (e instanceof RoundStartEvent) {
+            this.currentRound = e.round;
             this.board = [];
             this.unfoldedPlayers = e.players.slice(0);
             this.unfoldedPlayers.splice(this.unfoldedPlayers.indexOf(this.player), 1);

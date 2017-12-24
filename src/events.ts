@@ -2,6 +2,7 @@ import { Player } from "./Player";
 import { Pot } from "./Pot";
 import { Bet } from "./Bet";
 import { Card } from "./Card";
+import { Round } from "./Round";
 
 export interface GameEvent { }
 
@@ -33,26 +34,26 @@ export class PotChangeEvent implements GameEvent {
     }
 }
 
-export class GameStartEvent implements GameEvent {
+export class RoundStartEvent implements GameEvent {
+    public round: Round;
     public players: Player[];
 
-    constructor(players: Player[]) {
+    constructor(round: Round, players: Player[]) {
+        this.round = round;
         this.players = players;
     }
 }
 
 export class BetAwaitEvent implements GameEvent {
     public player: Player;
-    public callback;
     public current: number;
     public committed: number;
     public canRaise: boolean;
     public minRaise: number;
     public potCheck;
 
-    constructor(player: Player, callback, current: number, committed: number, canRaise: boolean, minRaise: number, potCheck) {
+    constructor(player: Player, current: number, committed: number, canRaise: boolean, minRaise: number, potCheck) {
         this.player = player;
-        this.callback = callback;
         this.current = current;
         this.committed = committed;
         this.canRaise = canRaise;
@@ -95,7 +96,7 @@ export class DealtRiverEvent implements GameEvent {
     }
 }
 
-export class GameEndEvent implements GameEvent {
+export class RoundEndEvent implements GameEvent {
     public result;
     public moneyChange: { [name: string]: number };
 

@@ -6,7 +6,7 @@ import { UserController } from "./UserController";
 
 export class LocalPlayApp {
 
-    private table: LocalTable;
+    private table: LocalTable | undefined;
     private view: LocalTableView;
 
     init() {

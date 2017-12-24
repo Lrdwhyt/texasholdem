@@ -1,6 +1,10 @@
 import { LocalTable } from "./LocalTable";
 import { Player } from "./Player";
-import { GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent, GameStartEvent, GameEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent, DealtTurnEvent, DealtRiverEvent } from "./events";
+import {
+    GameEvent, DealtHandEvent, PlayerMoneyChangeEvent, PotChangeEvent,
+    RoundStartEvent, RoundEndEvent, BetAwaitEvent, BetMadeEvent, DealtFlopEvent,
+    DealtTurnEvent, DealtRiverEvent
+} from "./events";
 import { Bet, BetType } from "./Bet";
 import { Betting } from "./betting";
 import { Pot } from "./Pot";
@@ -8,8 +12,13 @@ import { Deck } from "./Deck";
 import { Card } from "./Card";
 import { HandUtils } from "./Hands";
 import { BettingStage } from "./BettingStage";
+import { RoundStage } from "./RoundStage";
+import { Round } from "./Round";
 
-export class LocalRound {
+export class LocalRound implements Round {
+    private eventStack: GameEvent[];
+    private currentStage: RoundStage;
+
     private players: Player[];
     private bettingPlayers: Player[];
     private unfoldedPlayers: Player[];
@@ -42,6 +51,8 @@ export class LocalRound {
     private match: LocalTable;
 
     constructor(players: Player[], button: number, match: LocalTable, ante: number) {
+        this.currentStage = RoundStage.Setup;
+
         this.match = match;
 
         this.players = players.slice(0);
@@ -75,17 +86,17 @@ export class LocalRound {
 
         this.bettingStage = BettingStage.NONE;
 
-        this.init();
+        this.start();
     }
 
-    init(): void {
+    start(): void {
         for (let player of this.players) {
             this.playerBets[player.getName()] = 0;
             this.initialMoney[player.getName()] = player.getMoney();
             player.resetHand();
         }
 
-        this.dispatchEvent(new GameStartEvent(this.players));
+        this.dispatchEvent(new RoundStartEvent(this, this.players));
         this.deductAntes(this.ante);
         if (this.players.length === 2) { // Blinds have special rules with only 2 players
             this.deductBlind(this.firstPlayer, this.smallBlind);
@@ -101,11 +112,25 @@ export class LocalRound {
         }
 
         this.bettingStage = BettingStage.PREFLOP;
-        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.playerBets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
+        this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.currentBet,
+            this.playerBets[this.currentPlayer.getName()],
+            this.canRaise, this.minRaise, this.getEligiblePot));
     }
 
     dispatchEvent(e: GameEvent) {
         this.match.dispatchEvent(e);
+    }
+
+    getAllEvents(player: Player): GameEvent[] {
+        return this.eventStack;
+    }
+
+    getLastEvent(player: Player): GameEvent {
+        return this.eventStack[this.eventStack.length - 1];
+    }
+
+    getCurrentStage(): RoundStage {
+        return this.currentStage;
     }
 
     deal(): void {
@@ -371,7 +396,7 @@ export class LocalRound {
         this.dispatchEvent(new DealtRiverEvent(this.river));
     }
 
-    finish(): void {
+    processResults(): void {
         let result;
         for (let index in this.pots) {
             if (index === "0") {
@@ -384,7 +409,7 @@ export class LocalRound {
         for (let player of this.players) {
             moneyChange[player.getName()] = player.getMoney() - this.initialMoney[player.getName()];
         }
-        this.dispatchEvent(new GameEndEvent(result, moneyChange));
+        this.dispatchEvent(new RoundEndEvent(result, moneyChange));
     }
 
     doShowdown(): void {
@@ -410,10 +435,10 @@ export class LocalRound {
         for (let player of this.players) {
             moneyChange[player.getName()] = player.getMoney() - this.initialMoney[player.getName()];
         }
-        this.dispatchEvent(new GameEndEvent(result, moneyChange));
+        this.dispatchEvent(new RoundEndEvent(result, moneyChange));
     }
 
-    makeBet = (player: Player, bet: Bet): void => {
+    handleBet = (player: Player, bet: Bet): void => {
         if (this.currentPlayer !== player) {
             return; // Not player's turn to bet
         }
@@ -433,9 +458,10 @@ export class LocalRound {
         }
 
         if (this.unfoldedPlayers.length === 1) { // Last player wins by default
-            this.finish();
+            this.processResults();
             return;
-        } else if (this.bettingPlayers.length === 0 || this.bettingPlayers.length === 1 && this.currentBet === this.playerBets[this.bettingPlayers[0].getName()]) {
+        } else if (this.bettingPlayers.length === 0 ||
+            this.bettingPlayers.length === 1 && this.currentBet === this.playerBets[this.bettingPlayers[0].getName()]) {
             // Only one player or no players left betting, so no need to continue betting
             this.doShowdown();
             return;
@@ -478,16 +504,16 @@ export class LocalRound {
             }
         }
         if (this.bettingStage !== BettingStage.COMPLETE) {
-            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.makeBet, this.currentBet, this.playerBets[this.currentPlayer.getName()], this.canRaise, this.minRaise, this.getEligiblePot));
+            this.dispatchEvent(new BetAwaitEvent(this.currentPlayer, this.currentBet,
+                this.playerBets[this.currentPlayer.getName()],
+                this.canRaise, this.minRaise, this.getEligiblePot));
         }
     }
 
-    terminate() {
-        this.currentPlayer = null;
+    finish() {
+        this.currentPlayer = undefined;
+        this.currentStage = RoundStage.Complete;
         // Prevent further bets
     }
-
-    getCurrentStage() { }
-    getAllEvents(player: Player) { }
 
 }
