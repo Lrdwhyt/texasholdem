@@ -30,7 +30,8 @@ export class AIController implements Controller {
         this.unfoldedPlayers = [];
     }
 
-    calculateBet(cards: Card[], board: Card[], currentBet: number, amountCommitted: number, minRaise: number, playerMoney: number, potCheck: (player: Player, amount: number) => number): Bet {
+    calculateBet(cards: Card[], board: Card[], currentBet: number, amountCommitted: number, minRaise: number,
+        playerMoney: number, potCheck: (player: Player, amount: number) => number): Bet {
 
         let deck: Deck = new Deck();
 
@@ -302,11 +303,13 @@ export class AIController implements Controller {
         } else if (e instanceof BetAwaitEvent) {
 
             if (e.player === this.player) {
-                let bet = this.calculateBet(this.hand, this.board, e.current, e.committed, e.minRaise, this.player.getMoney(), e.potCheck);
+                let bet = this.calculateBet(this.hand, this.board, e.current, e.committed,
+                    e.minRaise, this.player.getMoney(), e.potCheck);
                 if (e.canRaise === false && bet.type === BetType.Raise) {
                     bet = new Bet(BetType.Call);
                 }
-                setTimeout(() => e.callback(this.player, bet), 700); // delay AI moves to make game more realistic
+                setTimeout(() => this.currentRound.handleBet(this.player, bet), 700);
+                // delay AI moves to make game more realistic
             }
 
         } else if (e instanceof BetMadeEvent) {

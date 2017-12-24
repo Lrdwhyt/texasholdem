@@ -6,7 +6,7 @@ import { GameEvent, DealtHandEvent, RoundEndEvent } from "./events";
 export class LocalTable {
     private players: Player[];
     private people: Player[];
-    private game: Round;
+    private round: Round;
     private buttonPosition: number;
     private hands: number;
 
@@ -29,7 +29,7 @@ export class LocalTable {
             player.getController().dispatchEvent(e);
         }
         if (e instanceof RoundEndEvent) {
-            this.game = undefined;
+            this.round = undefined;
         }
     }
 
@@ -40,20 +40,21 @@ export class LocalTable {
                 this.players.push(person);
             }
         }
-        if (this.players.length >= 2 && (this.game === undefined || this.game === null)) {
+        if (this.players.length >= 2 && (this.round === undefined || this.round === null)) {
             ++this.buttonPosition;
             if (this.buttonPosition >= this.players.length) {
                 this.buttonPosition = 0;
             }
             ++this.hands;
-            this.game = new LocalRound(this.players, this.buttonPosition, this, 50 * Math.pow(2, Math.floor(this.hands / 6)));
+            this.round = new LocalRound(this.players, this.buttonPosition, this, 50 * Math.pow(2, Math.floor(this.hands / 6)));
+            this.round.start();
         }
     }
 
     finish() {
-        if (this.game !== undefined) {
-            this.game.finish();
-            this.game = undefined;
+        if (this.round !== undefined) {
+            this.round.finish();
+            this.round = undefined;
         }
     }
 }

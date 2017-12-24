@@ -138,7 +138,7 @@ export class UserController implements Controller {
                 this.currentBet = e.current;
                 this.amountCommitted = e.committed;
                 this.view.disableBetting();
-                this.view.restrictToValid(this.amountToCall, e.canRaise, e.minRaise, this.player.getMoney());
+                this.view.restrictToValid(this.amountToCall, e.canRaise, this.player.getMoney());
                 this.isTurnToBet = true;
                 if (this.hasQueuedBet === true) {
                     this.placeBet(this.queuedBet);
@@ -149,7 +149,7 @@ export class UserController implements Controller {
                 this.canRaise = e.canRaise;
                 this.minRaise = e.minRaise;
                 this.view.disableBetting();
-                this.view.restrictToValid(this.amountToCall, e.canRaise, e.minRaise, this.player.getMoney());
+                this.view.restrictToValid(this.amountToCall, e.canRaise, this.player.getMoney());
             }
 
         } else if (e instanceof BetMadeEvent) {
@@ -199,7 +199,7 @@ export class UserController implements Controller {
             this.hasQueuedBet = false;
             this.view.resetBetStatusText();
             this.view.resetBettingUI();
-            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.player.getMoney());
 
         } else if (e instanceof DealtTurnEvent) {
 
@@ -210,7 +210,7 @@ export class UserController implements Controller {
             this.hasQueuedBet = false;
             this.view.resetBetStatusText();
             this.view.resetBettingUI();
-            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.player.getMoney());
 
         } else if (e instanceof DealtRiverEvent) {
 
@@ -221,17 +221,16 @@ export class UserController implements Controller {
             this.hasQueuedBet = false;
             this.view.resetBetStatusText();
             this.view.resetBettingUI();
-            this.view.restrictToValid(this.amountToCall, this.canRaise, this.minRaise, this.player.getMoney());
+            this.view.restrictToValid(this.amountToCall, this.canRaise, this.player.getMoney());
 
         } else if (e instanceof RoundEndEvent) {
             this.view.resetBettingUI();
             if (e.result) {
                 for (let playerName in e.moneyChange) {
+                    let ele = document.querySelector("[name=" + playerName + "] .money");
                     if (e.moneyChange[playerName] > 0) {
-                        let ele = document.querySelector("[name=" + playerName + "] .money");
                         ele.textContent += " (+" + e.moneyChange[playerName] + ")";
                     } else if (e.moneyChange[playerName] < 0) {
-                        let ele = document.querySelector("[name=" + playerName + "] .money");
                         ele.textContent += " (" + e.moneyChange[playerName] + ")";
                     }
                 }

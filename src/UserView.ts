@@ -237,7 +237,7 @@ export class UserView {
         betInput.value = String(this.controller.constrainBetAmount(betAmount));
     }
 
-    restrictToValid(amountToCall: number, canRaise: boolean, minRaise: number, money: number): void {
+    restrictToValid(amountToCall: number, canRaise: boolean, money: number): void {
         let allInButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("all-in");
         let foldButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("fold");
         let checkButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById("check");
