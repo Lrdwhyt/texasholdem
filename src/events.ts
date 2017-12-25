@@ -37,10 +37,12 @@ export class PotChangeEvent implements GameEvent {
 export class RoundStartEvent implements GameEvent {
     public round: Round;
     public players: Player[];
+    public button: number;
 
-    constructor(round: Round, players: Player[]) {
+    constructor(round: Round, players: Player[], button: number) {
         this.round = round;
         this.players = players;
+        this.button = button;
     }
 }
 

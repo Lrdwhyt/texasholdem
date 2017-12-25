@@ -104,6 +104,7 @@ export class UserController implements Controller {
                 document.getElementById("bet-controls").innerHTML = "";
             }
             this.view.drawBoard(otherPlayers);
+            this.view.markButton(e.players[e.button]);
             this.hasQueuedBet = false;
             this.currentBet = 0;
             this.minRaise = 0;

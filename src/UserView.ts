@@ -197,6 +197,11 @@ export class UserView {
         }
     }
 
+    markButton(player: Player) {
+        let ele = document.querySelector("[name=" + player.getName() + "] .name");
+        ele.innerHTML += "(B)";
+    }
+
     updatePot(pots: Pot[]): void {
         let potElement: HTMLElement | null = document.getElementById("pots");
         if (pots.length === 1 || pots[1].size() === 0) { // Only main pot

@@ -47,11 +47,13 @@ export class LocalRound implements Round {
     private canRaise: boolean;
     private reachedLastPlayer: boolean;
 
+    private button: number;
     private bettingStage: BettingStage;
     private match: LocalTable;
 
     constructor(players: Player[], button: number, match: LocalTable, ante: number) {
         this.currentStage = RoundStage.Setup;
+        this.eventStack = [];
 
         this.match = match;
 
@@ -76,13 +78,18 @@ export class LocalRound implements Round {
         this.currentBet = this.ante + this.bigBlind;
         this.minRaise = this.bigBlind;
 
-        this.firstPlayer = this.getPrevPlayer(this.players[button]);
+        if (players.length === 2) {
+            this.firstPlayer = this.players[button];
+        } else {
+            this.firstPlayer = this.getNextPlayer(this.getNextPlayer(this.getNextPlayer(this.players[button])));
+        }
         this.lastPlayer = this.getPrevPlayer(this.firstPlayer); //Where to end betting if no one raises
         this.currentPlayer = this.firstPlayer;
         this.lastRaiser = null;
 
         this.canRaise = true;
         this.reachedLastPlayer = false;
+        this.button = button;
 
         this.bettingStage = BettingStage.NONE;
     }
@@ -93,7 +100,7 @@ export class LocalRound implements Round {
             this.initialMoney[player.getName()] = player.getMoney();
         }
 
-        this.dispatchEvent(new RoundStartEvent(this, this.players));
+        this.dispatchEvent(new RoundStartEvent(this, this.players, this.button));
         this.currentStage = RoundStage.Dealing;
         this.deductAntes(this.ante);
         if (this.players.length === 2) { // Blinds have special rules with only 2 players
