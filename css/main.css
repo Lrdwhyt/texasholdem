@@ -1,36 +1,43 @@
 html, body {
     color: #fff;
+    font-family: Helvetica, Arial, sans-serif;
     margin: 0;
 }
 
 #primary-nav {
-    background: #234;
+    background: rgb(35, 34, 68);
     height: 2em;
 }
 
 #secondary-nav {
-    background: #345;
+    background: rgb(53, 51, 85);
     height: 2em;
 }
 
 #primary-nav a {
+    color: #fff;
     display: inline-block;
-    color: inherit;
-    height: 100%;
+    height: 1.2em;
+    padding: 0.4em 1em;
     text-decoration: none;
-    padding: 0 10px;
 }
 
 #primary-nav a:hover {
-    opacity: 0.7;
+    background: rgb(72, 74, 187);
 }
 
-#secondary-nav div {
+#secondary-nav a {
     display: inline-block;
+    height: 1.2em;
+    padding: 0.4em 1em;
+}
+
+#secondary-nav a:hover {
+    background: rgb(72, 74, 187);
 }
 
 #container {
-    background: #456;
+    background: rgb(59, 61, 179);
     min-height: 600px;
     min-width: 1080px;
     padding-top: 10px;
@@ -68,7 +75,7 @@ html, body {
 }
 
 #board {
-    border: 2px solid #678;
+    border: 2px solid #667;
     border-radius: 3px;
     margin: 0 auto;
     height: 174px;
